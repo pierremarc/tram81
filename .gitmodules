@@ -1,0 +1,3 @@
+[submodule "tram81/assets/ext/leaflet"]
+	path = tram81/assets/ext/leaflet
+	url = git@github.com:Leaflet/Leaflet.git
