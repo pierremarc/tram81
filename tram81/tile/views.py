@@ -26,15 +26,17 @@ class Map(object):
     root = os.path.join(settings.MEDIA_ROOT, 'tiles')
     
     def __init__(self):
+        print 'CREATE MAP: %s'%(settings.MAPNIK_MAPFILE,)
         self.mapfile = settings.MAPNIK_MAPFILE
         self.map = mapnik.Map(settings.MAPNIK_TILE_SIZE, settings.MAPNIK_TILE_SIZE)
         mapnik.load_map(self.map, self.mapfile)
-        self.map.maximum_extent = mapnik.Box2d(-180,-90,180,90)
-        try:
-            self.map.srs = settings.MAPNIK_MAP_SRS
-        except AttributeError:
-            self.map.srs = EPSG_3857_proj.params()
-            
+        #self.map.maximum_extent = mapnik.Box2d(-180,-90,180,90)
+        #try:
+            #self.map.srs = settings.MAPNIK_MAP_SRS
+        #except AttributeError:
+            #self.map.srs = EPSG_3857_proj.params()
+           
+        self.map.zoom_to_box(self.map.maximum_extent)
         
         self.proj = mapnik.Projection(self.map.srs)
         self.transform = mapnik.ProjTransform(longlat_proj, self.proj)
@@ -57,26 +59,12 @@ class Map(object):
         #if not os.path.exists(tile_dir):
             #os.makedirs(tile_dir)
         if not os.path.exists(tile_path):
-            ts = settings.MAPNIK_TILE_SIZE
-            #mapnik.render_tile_to_file(self.map, x*ts, y*ts, ts, ts, tile_path, image_type)
-            edges = tileEdges(x,y,z)
-            miny, minx, maxy, maxx = list(edges)
-            
-            miny, minx = tile_to_longlat(x,y,z)
-            maxy, maxx = tile_to_longlat(x +1,y +1,z)
-            
-            bbox = mapnik.Box2d(minx, miny, maxx, maxy)
-            
-            map_bbox = self.transform.forward(bbox)
-            print map_bbox
-            self.map.zoom_to_box(map_bbox)
-            im = mapnik.Image(settings.MAPNIK_TILE_SIZE, settings.MAPNIK_TILE_SIZE)
-            mapnik.render(self.map, im)
+            im = self.get_tile(z,x,y)
             im.save(tile_path, image_type)
             
         return tile_path
     
-    def get_tile(self, z, x, y, image_type='png'):
+    def get_tile(self, z, x, y):
         
         ts = settings.MAPNIK_TILE_SIZE
         self.map.resize(ts, ts)
@@ -86,17 +74,18 @@ class Map(object):
         
         bbox = mapnik.Box2d(minx, miny, maxx, maxy)
         map_bbox = self.transform.forward(bbox)
-        #print '%s %s'%(map_bbox.width(), map_bbox.height())
-        self.map.zoom_to_box(map_bbox)
-        print '%s'%(self.map.view_transform().forward( self.map.envelope() ))
         
+        self.map.zoom_to_box(map_bbox)
+        if(self.map.buffer_size < (ts/2)):
+            self.map.buffer_size = ts / 2
+            
         im = mapnik.Image(ts , ts )
         mapnik.render(self.map, im, 1, 0, 0)
-        return im.tostring(image_type)
+        return im
 
-
+mapnik_map = Map()
 def get_tile(request, z,x,y):
-    mapnik_map = Map()
+    global mapnik_map
     #tile_path = mapnik_map.get_tile_path(int(z),
                                          #int(x),
                                          #int(y))
@@ -104,10 +93,9 @@ def get_tile(request, z,x,y):
     
     buf = mapnik_map.get_tile(int(z),
                             int(x),
-                            int(y))
+                            int(y)).tostring('png')
     response = HttpResponse()
     response['Content-length'] = len(buf)
     response['Content-Type'] = "image/png"
     response.write(buf)
     return response
-    #return HttpResponse(buf, content_type="image/png")

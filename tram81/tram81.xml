@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE Map[]>
-<Map srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over" background-color="#eeeeee" maximum-extent="-20037508.34,-20037508.34,20037508.34,20037508.34">
+<Map 
+    srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over" 
+    background-color="#ffffff" 
+    maximum-extent="-20037508.34,-20037508.34,20037508.34,20037508.34">
 
 <Parameters>
   <Parameter name="bounds">-180,-85.05112877980659,180,85.05112877980659</Parameter>
@@ -14,19 +17,27 @@
 
 <Style name="trams" filter-mode="first">
   <Rule>
-    <LineSymbolizer stroke-width="2" stroke="#990000" />
+    <Filter>([data_0] = '97')</Filter>
+    <LineSymbolizer stroke-width="2" stroke="#6d071a" />
+  </Rule>
+  <Rule>
+    <Filter>([data_0] = '82')</Filter>
+    <LineSymbolizer stroke-width="2" stroke="#318ce7" />
+  </Rule>
+  <Rule>
+    <Filter>([data_0] = '81')</Filter>
+    <LineSymbolizer stroke-width="2" stroke="#16b84e" />
   </Rule>
 </Style>
 <Layer name="trams"
   srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over">
     <StyleName>trams</StyleName>
     <Datasource>
-       <Parameter name="connect_timeout"><![CDATA[30]]></Parameter>
+        <Parameter name="estimate_extent">false</Parameter>
        <Parameter name="type"><![CDATA[postgis]]></Parameter>
        <Parameter name="table"><![CDATA[coline_line]]></Parameter>
        <Parameter name="key_field"><![CDATA[]]></Parameter>
        <Parameter name="geometry_field"><![CDATA[]]></Parameter>
-       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
        <Parameter name="dbname"><![CDATA[geo0]]></Parameter>
        <Parameter name="host"><![CDATA[xvm-5-152.ghst.net]]></Parameter>
        <Parameter name="port"><![CDATA[5432]]></Parameter>
@@ -43,23 +54,45 @@
     <MarkersSymbolizer width="6" fill="#ff4455" stroke="#995566" allow-overlap="true" />
   </Rule>
 </Style>
+<Layer name="stops"
+  srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over">
+    <StyleName>stops</StyleName>
+    <Datasource>
+        <Parameter name="estimate_extent">false</Parameter>
+       <Parameter name="type"><![CDATA[postgis]]></Parameter>
+       <Parameter name="table"><![CDATA[coline_point]]></Parameter>
+       <Parameter name="key_field"><![CDATA[]]></Parameter>
+       <Parameter name="geometry_field"><![CDATA[]]></Parameter>
+       <Parameter name="dbname"><![CDATA[geo0]]></Parameter>
+       <Parameter name="host"><![CDATA[xvm-5-152.ghst.net]]></Parameter>
+       <Parameter name="port"><![CDATA[5432]]></Parameter>
+       <Parameter name="user"><![CDATA[tram]]></Parameter>
+       <Parameter name="password"><![CDATA[plokplok]]></Parameter>
+       <Parameter name="id"><![CDATA[stops]]></Parameter>
+       <Parameter name="project"><![CDATA[tram81]]></Parameter>
+       <Parameter name="srs"><![CDATA[+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over]]></Parameter>
+    </Datasource>
+  </Layer>
 
 <Style name="poly" filter-mode="first">
   <Rule>
-    <PolygonSymbolizer fill-opacity="1" fill="green"/>
+    <Filter>([data_0] = 'next')</Filter>
+    <LineSymbolizer stroke="#000000" stroke-width="1" />
+  </Rule>
+  <Rule>
+    <LineSymbolizer stroke="#5a5e6b" stroke-width="0.5" />
   </Rule>
 </Style>
 <Layer name="poly"
   srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over">
     <StyleName>poly</StyleName>
     <Datasource>
-       <Parameter name="connect_timeout"><![CDATA[30]]></Parameter>
+        <Parameter name="estimate_extent">false</Parameter>
+       <Parameter name="cursor_size"><![CDATA[300000]]></Parameter>
        <Parameter name="type"><![CDATA[postgis]]></Parameter>
-       <Parameter name="table"><![CDATA[(select * from coline_polygon) as polys]]></Parameter>
+       <Parameter name="table"><![CDATA[coline_polygon]]></Parameter>
        <Parameter name="key_field"><![CDATA[]]></Parameter>
        <Parameter name="geometry_field"><![CDATA[]]></Parameter>
-<!--        <Parameter name="extent_cache"><![CDATA[auto]]></Parameter> -->
-       <Parameter name="extent"><![CDATA[476528.689965692,6588285.60998021,497382.802096508,6594088.45742635]]></Parameter>
        <Parameter name="dbname"><![CDATA[geo0]]></Parameter>
        <Parameter name="host"><![CDATA[xvm-5-152.ghst.net]]></Parameter>
        <Parameter name="port"><![CDATA[5432]]></Parameter>

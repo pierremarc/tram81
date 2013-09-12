@@ -122,6 +122,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
+    'tram81',
     'tile',
 )
 
@@ -156,6 +157,6 @@ LOGGING = {
 
 
 MAPNIK_MAPFILE = '/home/pierre/System/src/tram81/tram81/tram81.xml'
-#MAPNIK_MAPFILE = '/home/pierre/System/src/tram81/nat.xml'
+#MAPNIK_MAPFILE = '/home/pierre/System/src/tram81/tt.xml'
 #MAPNIK_MAP_SRS = ''
 MAPNIK_TILE_SIZE = 256
