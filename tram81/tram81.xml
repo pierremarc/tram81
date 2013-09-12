@@ -88,7 +88,7 @@
     <StyleName>poly</StyleName>
     <Datasource>
         <Parameter name="estimate_extent">false</Parameter>
-       <Parameter name="cursor_size"><![CDATA[300000]]></Parameter>
+<!--        <Parameter name="cursor_size"><![CDATA[300000]]></Parameter> -->
        <Parameter name="type"><![CDATA[postgis]]></Parameter>
        <Parameter name="table"><![CDATA[coline_polygon]]></Parameter>
        <Parameter name="key_field"><![CDATA[]]></Parameter>

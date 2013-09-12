@@ -11,6 +11,8 @@ mapnik.logger.set_severity(mapnik.severity_type.Error)
 from .tilenames import tileEdges
 
 import math
+from threading import Lock
+
 def tile_to_longlat(x, y, z):
   n = 2.0 ** z
   lon_deg = x / n * 360.0 - 180.0
@@ -27,6 +29,9 @@ class Map(object):
     
     def __init__(self):
         print 'CREATE MAP: %s'%(settings.MAPNIK_MAPFILE,)
+        
+        self.mutex = Lock()
+        
         self.mapfile = settings.MAPNIK_MAPFILE
         self.map = mapnik.Map(settings.MAPNIK_TILE_SIZE, settings.MAPNIK_TILE_SIZE)
         mapnik.load_map(self.map, self.mapfile)
@@ -65,22 +70,30 @@ class Map(object):
         return tile_path
     
     def get_tile(self, z, x, y):
+        self.mutex.acquire()
         
-        ts = settings.MAPNIK_TILE_SIZE
-        self.map.resize(ts, ts)
-        
-        miny, minx = tile_to_longlat(x ,y ,z)
-        maxy, maxx = tile_to_longlat(x + 1, y + 1, z)
-        
-        bbox = mapnik.Box2d(minx, miny, maxx, maxy)
-        map_bbox = self.transform.forward(bbox)
-        
-        self.map.zoom_to_box(map_bbox)
-        if(self.map.buffer_size < (ts/2)):
-            self.map.buffer_size = ts / 2
+        try:
+            ts = settings.MAPNIK_TILE_SIZE
+            self.map.resize(ts, ts)
             
-        im = mapnik.Image(ts , ts )
-        mapnik.render(self.map, im, 1, 0, 0)
+            miny, minx = tile_to_longlat(x ,y ,z)
+            maxy, maxx = tile_to_longlat(x + 1, y + 1, z)
+            
+            bbox = mapnik.Box2d(minx, miny, maxx, maxy)
+            map_bbox = self.transform.forward(bbox)
+            
+            self.map.zoom_to_box(map_bbox)
+            if(self.map.buffer_size < (ts/2)):
+                self.map.buffer_size = ts / 2
+                
+            #for l in self.map.layers:
+                #print '%s %d'%(l.name, len(l.datasource.all_features()))
+            
+            im = mapnik.Image(ts , ts )
+            mapnik.render(self.map, im, 1, 0, 0)
+        finally:
+            self.mutex.release()
+
         return im
 
 mapnik_map = Map()
