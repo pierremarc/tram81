@@ -96,15 +96,32 @@ class Map(object):
 
         return im
 
-mapnik_map = Map()
+
+class MapPool(object):
+    def __init__(self, pool_max=6):
+        self.pool_max = pool_max
+        self.current_idx = 0
+        self.maps = []
+        for i in range(self.pool_max):
+            self.maps.append(Map())
+        
+    def get_map(self):
+        self.current_idx += 1
+        if self.current_idx >= self.pool_max:
+            self.current_idx = 0
+            
+        return self.maps[self.current_idx]
+
+map_pool = MapPool()
+
 def get_tile(request, z,x,y):
-    global mapnik_map
+    global map_pool
     #tile_path = mapnik_map.get_tile_path(int(z),
                                          #int(x),
                                          #int(y))
     #buf = open(tile_path, 'rb').read()
     
-    buf = mapnik_map.get_tile(int(z),
+    buf = map_pool.get_map().get_tile(int(z),
                             int(x),
                             int(y)).tostring('png')
     response = HttpResponse()
