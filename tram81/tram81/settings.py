@@ -61,7 +61,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = '/home/pierre/System/src/tram81/static/'
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
@@ -122,8 +122,11 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
+    'django.contrib.gis',
+    'south',
     'tram81',
     'tile',
+    'api',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -156,7 +159,8 @@ LOGGING = {
 }
 
 
-MAPNIK_MAPFILE = '/home/pierre/System/src/tram81/tram81/tram81.xml'
-#MAPNIK_MAPFILE = '/home/pierre/System/src/tram81/tt.xml'
-#MAPNIK_MAP_SRS = ''
-MAPNIK_TILE_SIZE = 256
+try:
+    from local_settings import *
+except ImportError:
+    pass
+    

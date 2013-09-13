@@ -8,6 +8,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', IndexView.as_view(), name='index'),
+    url(r'^api/', include('api.urls')),
     url(r'^tile/', include('tile.urls')),
     url(r'^admin/', include(admin.site.urls)),
 )

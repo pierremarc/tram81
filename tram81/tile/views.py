@@ -116,10 +116,6 @@ map_pool = MapPool()
 
 def get_tile(request, z,x,y):
     global map_pool
-    #tile_path = mapnik_map.get_tile_path(int(z),
-                                         #int(x),
-                                         #int(y))
-    #buf = open(tile_path, 'rb').read()
     
     buf = map_pool.get_map().get_tile(int(z),
                             int(x),
