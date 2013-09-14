@@ -5,7 +5,7 @@ from collections import namedtuple
 
 from django.conf import settings
 from django.http import HttpResponse, Http404
-from django.contrib.gis.geos import Polygon
+from django.contrib.gis.geos import Polygon, MultiPolygon
 
 
 import mapnik
@@ -60,15 +60,18 @@ class ImageMixer(object):
         bpix = base.load()
         #tpix = top.load()
         
+        print base_box
+        print top_box
+        
         byy = range(base_box.maxy -1, base_box.miny -1, -1)
         bxx = range(base_box.minx, base_box.maxx)
         
         sz = (base_box.maxx - base_box.minx, 
               base_box.maxy - base_box.miny)
-        quad = ( top_box.minx, top_box.miny, # tl
-                top_box.minx, top_box.maxy,  # bl
-                top_box.maxx, top_box.maxy,  # br
-                top_box.maxx, top_box.miny)  # tr
+        quad = ( top_box.minx, top_box.maxy - 1, # tl
+                top_box.minx, top_box.miny - 1,  # bl
+                top_box.maxx, top_box.miny - 1,  # br
+                top_box.maxx, top_box.maxy - 1)  # tr
         tpix = top.transform(sz, Image.QUAD, quad, Image.BICUBIC).load()
         
         for y_idx in xrange(len(byy)):
@@ -77,11 +80,13 @@ class ImageMixer(object):
                 bx = bxx[x_idx]
                 vb = bpix[bx,by]
                 vt = tpix[x_idx, y_idx]
-                v =  tuple(map(lambda a,b: a*b/255, vb, vt))
-                bpix[bx,by] = v
+                #v =  tuple(map(lambda a,b: a*b/255, vb, vt))
+                v = [0,0,0,255]
+                for cc in range(3):
+                    v[cc] = vb[cc] * vt[cc] / 255
+                bpix[bx,by] = tuple(v)
                 
     def _ts(self, a, min_, max_, T):
-        print '_TS %f %f %f %f'%(a, min_, max_, T)
         r = a - min_
         return r * float(T) / (max_ - min_)
     
@@ -126,6 +131,7 @@ class ImageMixer(object):
             self.op_multiply(base, src_image, AB, AB)
             
             f = StringIO()
+            #base.transpose(Image.FLIP_TOP_BOTTOM).save(f, 'PNG')
             base.save(f, 'PNG')
             return mapnik.Image.fromstring(f.getvalue())
                 
@@ -161,8 +167,29 @@ class Map(object):
         #mb = self.map.envelope()
         #print 'Map extent: %s; latlon => %s'%(mb, self.inverse_transform.forward(mb))
         
-        if not os.path.exists(self.root):
-            os.makedirs(self.root)
+        #if not os.path.exists(self.root):
+            #os.makedirs(self.root)
+            
+        if settings.MAPNIK_DEBUG:
+            gs = GeoImage.objects.all()
+            csv_data = ['wkt, path']
+            
+            for g in gs:
+                csv_data.append('"%s","%s"'%(g.geom.wkt,g.image.path))
+            
+            datasource = mapnik.CSV(inline='\n'.join(csv_data))
+            s = mapnik.Style()
+            r = mapnik.Rule()
+            polygon_symbolizer = mapnik.PolygonSymbolizer(mapnik.Color('#6ADEFC'))
+            r.symbols.append(polygon_symbolizer)
+            s.rules.append(r)
+            self.map.append_style('DebugStyle',s)
+            layer = mapnik.Layer('debug')
+            layer.datasource = datasource
+            layer.styles.append('DebugStyle')
+            self.map.layers.append(layer)
+            
+        
         
     def get_tile_path(self, z, x, y, image_type='png'):
         sx = str(x)
