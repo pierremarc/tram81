@@ -1,6 +1,7 @@
 # Create your views here.
 
 import json
+from django.conf import settings
 from django.http import HttpResponse, Http404
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -31,10 +32,20 @@ def image_data(req, pk):
 class ImageCreate(CreateView):
     model = GeoImage
     fields = ['image','geom']
+    
+    def get_context_data(self, **kwargs):
+        context = super(ImageCreate, self).get_context_data(**kwargs)
+        context['TILE_SERVER'] = settings.TILE_SERVER
+        return context
 
 class ImageUpdate(UpdateView):
     model = GeoImage
-    fields = ['image','geom']
+    fields = ['pk','image','geom']
+    
+    def get_context_data(self, **kwargs):
+        context = super(ImageUpdate, self).get_context_data(**kwargs)
+        context['TILE_SERVER'] = settings.TILE_SERVER
+        return context
 
 class ImageDelete(DeleteView):
     model = GeoImage

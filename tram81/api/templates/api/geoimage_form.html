@@ -46,17 +46,10 @@
 
 jQuery(document).ready(function($){
     var cur_geom = undefined;
-{% if object %}
-{% autoescape off %}
-    cur_geom = JSON.parse('{{object.geom.geojson}}');
-{% endautoescape %}
-{% endif %}
-    var map = L.map('map').setView([50.854075572144815, 4.38629150390625], 13);
-        L.tileLayer('http://127.0.0.1:8000/tile/{z}/{x}/{y}', {
-        attribution: 'Me',
-        maxZoom: 18
-    }).addTo(map);
-
+    {% if object %} {% autoescape off %}
+        cur_geom = JSON.parse('{{object.geom.geojson}}');
+    {% endautoescape %} {% endif %}
+    
     var img = new Image;
     var $img = $(img);
     var $wrapper = $('<div />');
@@ -104,8 +97,10 @@ jQuery(document).ready(function($){
             
             $img.css({
                 opacity:'0.7',
-                width: w + 'px',
-                height: h + 'px',
+//                 width: (w-1) + 'px',
+//                 height: (h-1) + 'px',
+                width:'100%',
+                height:'100%',
                 'z-index':10,
             });
             
@@ -113,7 +108,7 @@ jQuery(document).ready(function($){
             $handle.css({
                 width:'16px',
                 height:'16px',
-                'background-color':'red',
+                'background-color':'blue',
             });
             
             
@@ -123,7 +118,7 @@ jQuery(document).ready(function($){
                 left: ix || '32px',
                 width: (w) + 'px',
                 height: (h) + 'px',
-                border:'1px solid blue',
+//                 border:'1px solid blue',
             });
             $img.appendTo($wrapper);
             $handle.appendTo($wrapper);
@@ -153,27 +148,37 @@ jQuery(document).ready(function($){
             $wrapper.on('dragstop',function(){ updateGeometry();});
             
             
-//             $('#submit').on('click', function(evt){
-//                 var E = $wrapper;
-//                 var x = E.position().left;
-//                 var y = E.position().top;
-//                 var w = E.width();
-//                 var h = E.height();
-//                 
-//                 var pts_ll = [
-//                     map.containerPointToLatLng(new L.Point(x,y)),
-//                     map.containerPointToLatLng(new L.Point(x+w,y)),
-//                     map.containerPointToLatLng(new L.Point(x+w,y+h)),
-//                     map.containerPointToLatLng(new L.Point(x,y+h)),
-//                     map.containerPointToLatLng(new L.Point(x,y)),
-//                 ]
-//                 
-// //                 var polyline = L.polyline(pts_ll, {color: 'red'}).addTo(map);
-//                 updateGeometry();
-//                 $('#form_add').submit();
-//             });
         
         };
+    /////////////////////////////////
+    
+    
+    //// SETUP GEOIMAGE
+    {% if object %}
+    {% autoescape off %}
+    function setupuGeoImage(evt){
+        map.once('viewreset', function(evt){
+            var ix = map.latLngToContainerPoint(gb.getNorthWest()).x;
+            var iy = map.latLngToContainerPoint(gb.getNorthWest()).y;
+            var iw = map.latLngToContainerPoint(gb.getNorthEast()).x - ix;
+            var ih = map.latLngToContainerPoint(gb.getSouthWest()).y - iy;
+            $img = $('<img />');
+            $img.css({
+                opacity:'0.7',
+                width: iw + 'px',
+                height: ih + 'px',
+                'z-index':10,
+            });
+            $img.appendTo('#map');
+            $img.attr('src', '{{object.image.url}}');
+            insertImage(ix, iy, iw, ih);
+        });
+        var gg = new L.geoJson(cur_geom);
+        var gb = gg.getBounds();
+        map.fitBounds(gb);
+    };
+    {% endautoescape %}
+    {% endif %}
     /////////////////////////////////
     
     /// HANDLE FILES ////////////////
@@ -211,38 +216,18 @@ jQuery(document).ready(function($){
         reader.readAsDataURL(f);
     };
     /////////////////////////////////
+    var map = L.map('map').setView([50.854075572144815, 4.38629150390625], 13);
     
+    var base_layer = L.tileLayer('{{TILE_SERVER}}', {
+        attribution: 'Me',
+        maxZoom: 18
+    });
+    {% if object %}
+    base_layer.once('load', setupuGeoImage);
+    {% endif %}
+    base_layer.addTo(map);
     $('#f').on('change', handleFiles);
     
-    
-    {% if object %}
-    {% autoescape off %}
-    
-        var gg = new L.geoJson(cur_geom);
-        var gb = gg.getBounds();
-        map.fitBounds(gb);
-        var ix = map.latLngToContainerPoint(gb.getNorthWest()).x;
-        var iy = map.latLngToContainerPoint(gb.getNorthWest()).y;
-        var iw = map.latLngToContainerPoint(gb.getSouthEast()).x - ix;
-        var ih = map.latLngToContainerPoint(gb.getSouthEast()).x - iy;
-        $img = $('<img />');
-        $img.css({
-            opacity:'0.7',
-            width: iw + 'px',
-            height: ih + 'px',
-            'z-index':10,
-        });
-        $img.appendTo('#map');
-        $img.attr('src', '{{object.image.url}}');
-        insertImage(ix, iy, iw, ih);
-    
-    {% endautoescape %}
-    {% endif %}
-    
-    
-    
-    
-
 })
 
 </script>
@@ -257,6 +242,9 @@ jQuery(document).ready(function($){
 <form id="form_add" method="POST" action="{% url 'image_add' %}" enctype="multipart/form-data">
 {% csrf_token %}
     <input name="geom" type="hidden" id="wkt" value="{%if object%}{{object.geom.wkt}}{% endif %}"></input>
+    {% if object %}
+    <input name="pk" type="hidden" id="pk" value="{{object.pk}}"></input>
+    {% endif %}
     <div class="form-group">
         {% if object %}
         <label for="f">L'image a inserer
