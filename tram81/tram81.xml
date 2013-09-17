@@ -9,8 +9,8 @@
   <Parameter name="bounds">-180,-85.05112877980659,180,85.05112877980659</Parameter>
   <Parameter name="center">0,0,2</Parameter>
   <Parameter name="format">png</Parameter>
-  <Parameter name="minzoom">0</Parameter>
-  <Parameter name="maxzoom">22</Parameter>
+  <Parameter name="minzoom">8</Parameter>
+  <Parameter name="maxzoom">28</Parameter>
   <Parameter name="name"><![CDATA[tram81]]></Parameter>
 </Parameters>
 

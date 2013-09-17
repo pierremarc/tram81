@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<title>GeoImage Form</title>
+<style>
+
+*{
+    margin:0;border:none;padding:0;
+}
+
+#map{
+    position:absolute;
+    top:0;
+    left:0;
+    width:70%;
+    height:100%;
+}
+
+#box{
+    position:absolute;
+    top:0;
+    left:70%;
+    width:30%;
+    height:100%;
+    padding:32px;
+    border-left:2px solid #D6D6D6;
+}
+
+.thumbnail{
+    width:180px;
+    height:120px;
+}
+
+</style>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"></link>
+<!--[if lte IE 8]>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
+<![endif]-->
+<script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+<script>
+
+jQuery(document).ready(function($){
+    var cur_geom = undefined;
+{% if object %}
+{% autoescape off %}
+    cur_geom = JSON.parse('{{object.geom.geojson}}');
+{% endautoescape %}
+{% endif %}
+    var map = L.map('map').setView([50.854075572144815, 4.38629150390625], 13);
+        L.tileLayer('http://127.0.0.1:8000/tile/{z}/{x}/{y}', {
+        attribution: 'Me',
+        maxZoom: 18
+    }).addTo(map);
+
+    var img = new Image;
+    var $img = $(img);
+    var $wrapper = $('<div />');
+    
+    /// UPDATE GEOM ///////////////////
+    function updateGeometry(){
+            var E = $wrapper;
+            var x = E.position().left;
+            var y = E.position().top;
+            var w = E.width();
+            var h = E.height();
+            
+            var pts_ll = [
+                map.containerPointToLatLng(new L.Point(x,   y)),
+                map.containerPointToLatLng(new L.Point(x+w, y)),
+                map.containerPointToLatLng(new L.Point(x+w, y+h)),
+                map.containerPointToLatLng(new L.Point(x,   y+h)),
+                map.containerPointToLatLng(new L.Point(x,   y)),
+            ]
+            var pts_str = _.map(pts_ll, function(ll){
+                return ll.lng+' '+ll.lat;
+            }).join(',');
+            
+            var wkt = 'POLYGON(('+pts_str+'))';
+            $('#wkt').val(wkt);
+            $('#info_wkt').text(wkt);
+        };
+    //////////////////////////////////
+    
+    /// INSER IMAGE /////////////////
+    function insertImage(ix, iy, width, height){
+            var nw = $img[0].naturalWidth || width;
+            var nh = $img[0].naturalHeight || height;
+            var ts = 200
+            var ratio = nw/nh;
+            
+            var w = (nw > nh) ? ts : (nw * ts / nh);
+            var h = (nh >= nw) ? ts : (nh * ts / nw);
+            
+            if(width)
+            {
+                w = width;
+                h = height;
+            }
+            
+            $img.css({
+                opacity:'0.7',
+                width: w + 'px',
+                height: h + 'px',
+                'z-index':10,
+            });
+            
+            $handle = $('<div />').addClass('ui-resizable-handle ui-resizable-se');
+            $handle.css({
+                width:'16px',
+                height:'16px',
+                'background-color':'red',
+            });
+            
+            
+            $wrapper.css({
+//                 position:'absolute',
+                top: iy || '32px',
+                left: ix || '32px',
+                width: (w) + 'px',
+                height: (h) + 'px',
+                border:'1px solid blue',
+            });
+            $img.appendTo($wrapper);
+            $handle.appendTo($wrapper);
+            $wrapper.appendTo('body');
+            
+            $wrapper.resizable({ 
+                handles: {se:$handle},
+                aspectRatio: ratio ,
+                containment: '#map',
+                alsoResize: $img,
+            });
+            $wrapper.draggable();
+            
+            updateGeometry();
+            
+            
+            $wrapper.on('resize', function(evt, ui){
+                $('#info_size').text(Math.floor(ui.size.width) +'+'+ui.size.height);
+//                 updateGeometry();
+            });
+            $wrapper.on('drag', function(evt,ui){
+                var pos = new L.Point(ui.offset.left, ui.offset.top);
+                var ll = map.containerPointToLatLng(pos);
+                $('#info_pos').text(ll);
+            });
+            $wrapper.on('resizestop',function(){ updateGeometry();});
+            $wrapper.on('dragstop',function(){ updateGeometry();});
+            
+            
+//             $('#submit').on('click', function(evt){
+//                 var E = $wrapper;
+//                 var x = E.position().left;
+//                 var y = E.position().top;
+//                 var w = E.width();
+//                 var h = E.height();
+//                 
+//                 var pts_ll = [
+//                     map.containerPointToLatLng(new L.Point(x,y)),
+//                     map.containerPointToLatLng(new L.Point(x+w,y)),
+//                     map.containerPointToLatLng(new L.Point(x+w,y+h)),
+//                     map.containerPointToLatLng(new L.Point(x,y+h)),
+//                     map.containerPointToLatLng(new L.Point(x,y)),
+//                 ]
+//                 
+// //                 var polyline = L.polyline(pts_ll, {color: 'red'}).addTo(map);
+//                 updateGeometry();
+//                 $('#form_add').submit();
+//             });
+        
+        };
+    /////////////////////////////////
+    
+    /// HANDLE FILES ////////////////
+    function handleFiles(evt) {
+        var files = evt.target.files;
+        if(files.length < 1)
+        {
+            console.log('No image to process');
+            return;
+        }
+        var f = files[0];
+        var imageType = /image.*/;
+        if (!f.type.match(imageType)) {
+            console.log('Type is not of image');
+            return;
+        }
+        
+        if($wrapper){
+            $wrapper.remove();
+            $wrapper = $('<div />');
+        }
+        
+        $img.on('load', function(evt){
+                insertImage();
+            });
+        
+        var reader = new FileReader();
+        reader.onload = (function(aImg) { 
+                            return function(e) 
+                            { 
+                                aImg.src = e.target.result; 
+                            }; 
+                        })(img);
+                        
+        reader.readAsDataURL(f);
+    };
+    /////////////////////////////////
+    
+    $('#f').on('change', handleFiles);
+    
+    
+    {% if object %}
+    {% autoescape off %}
+    
+        var gg = new L.geoJson(cur_geom);
+        var gb = gg.getBounds();
+        map.fitBounds(gb);
+        var ix = map.latLngToContainerPoint(gb.getNorthWest()).x;
+        var iy = map.latLngToContainerPoint(gb.getNorthWest()).y;
+        var iw = map.latLngToContainerPoint(gb.getSouthEast()).x - ix;
+        var ih = map.latLngToContainerPoint(gb.getSouthEast()).x - iy;
+        $img = $('<img />');
+        $img.css({
+            opacity:'0.7',
+            width: iw + 'px',
+            height: ih + 'px',
+            'z-index':10,
+        });
+        $img.appendTo('#map');
+        $img.attr('src', '{{object.image.url}}');
+        insertImage(ix, iy, iw, ih);
+    
+    {% endautoescape %}
+    {% endif %}
+    
+    
+    
+    
+
+})
+
+</script>
+</head>
+
+<body>
+<!-- <img src="test.png"  id="img"></img> -->
+<div id="map"></div>
+<div id="box">
+
+
+<form id="form_add" method="POST" action="{% url 'image_add' %}" enctype="multipart/form-data">
+{% csrf_token %}
+    <input name="geom" type="hidden" id="wkt" value="{%if object%}{{object.geom.wkt}}{% endif %}"></input>
+    <div class="form-group">
+        {% if object %}
+        <label for="f">L'image a inserer
+            <div>
+                Celle ci remplacera
+                <img class="thumbnail current_thumbnail" src="{{object.img_thumbnail}}"></img>
+            </div>
+        </label>
+        {% endif %}
+        <input name="image" type="file" id="f" ></input>
+    </div>
+    <button type="submit" class="btn btn-primary" id="submit" >enregistrer</button>
+</form>
+
+<!--<div id="info_size"></div>
+<div id="info_pos"></div>
+<div id="info_wkt"></div>-->
+
+
+
+</div>
+</body>
+</html>

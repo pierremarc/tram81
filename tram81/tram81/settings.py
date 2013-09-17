@@ -55,7 +55,7 @@ MEDIA_ROOT = '/home/pierre/System/src/tram81/media'
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://example.com/media/", "http://media.example.com/"
-MEDIA_URL = ''
+MEDIA_URL = '/media/'
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -100,7 +100,10 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
+
+INTERNAL_IPS = ('127.0.0.1',)
 
 ROOT_URLCONF = 'tram81.urls'
 
@@ -127,6 +130,8 @@ INSTALLED_APPS = (
     'tram81',
     'tile',
     'api',
+    'easy_thumbnails',
+    #'debug_toolbar',
 )
 
 # A sample logging configuration. The only tangible logging

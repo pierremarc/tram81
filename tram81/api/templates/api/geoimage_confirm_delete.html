@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<title>GeoImage Form</title>
+<style>
+
+.container{
+    margin-top:64px;
+}
+
+</style>
+<link rel="stylesheet" 
+    href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+</link>
+</head>
+<body>
+<div class="container">
+<form method="POST" action="{% url 'image_delete' pk=object.pk %}">
+{% csrf_token %}
+    <p>
+    Confirmation de la suppression de: {{object}}
+    <div>
+    <img src="{{object.img_thumbnail}}"></img>
+    </div>
+    </p>
+    <input type="submit" class="btn btn-warning" value="Supprimer" />
+</form>
+</div>
+</body>
+</html>

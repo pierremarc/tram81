@@ -3,36 +3,191 @@
 <title>test</title>
 <style>
 
+*{
+    margin:0;border:none;padding:0;
+}
+
 #map{
-    width:100%;
+    position:absolute;
+    top:0;
+    left:0;
+    width:50%;
+    height:100%;
+}
+
+#box{
+    position:absolute;
+    top:0;
+    left:50%;
+    width:50%;
     height:100%;
 }
 
 </style>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
 <!--[if lte IE 8]>
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
 <![endif]-->
-
 <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
-<script src="zepto.js"></script>
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
 <script>
 
-Zepto(function($){
-
-//     var $img = $('#img');
+jQuery(document).ready(function($){
 
     var map = L.map('map').setView([50.854075572144815, 4.38629150390625], 13);
-    L.tileLayer('http://127.0.0.1:8000/tile/{z}/{x}/{y}', {
-    attribution: 'Me',
-    maxZoom: 18
-}).addTo(map);
+        L.tileLayer('http://127.0.0.1:8000/tile/{z}/{x}/{y}', {
+        attribution: 'Me',
+        maxZoom: 18
+    }).addTo(map);
 
-//     var map = L.map('map').setView([50.854075572144815, 4.38629150390625], 13);
-//     L.tileLayer('http://xvm-5-152.ghst.net:2001/tile/tram81/{z}/{x}/{y}.png', {
-//     attribution: 'Me',
-//     maxZoom: 18
-// }).addTo(map);
+    var $img = undefined;
+    var $wrapper = undefined;
+    
+    function handleFiles(evt) {
+        var files = evt.target.files;
+        if(files.length < 1)
+        {
+            console.log('No image to process');
+            return;
+        }
+        var f = files[0];
+        var imageType = /image.*/;
+        if (!f.type.match(imageType)) {
+            console.log('Type is not of image');
+            return;
+        }
+        
+        if($wrapper){
+            $wrapper.remove();
+        }
+        
+        img = new Image;
+        $img = $(img);
+        $wrapper = $('<div />');
+        
+        function updateGeometry(){
+            var E = $wrapper;
+            var x = E.position().left;
+            var y = E.position().top;
+            var w = E.width();
+            var h = E.height();
+            
+            var pts_ll = [
+                map.containerPointToLatLng(new L.Point(x,y)),
+                map.containerPointToLatLng(new L.Point(x+w,y)),
+                map.containerPointToLatLng(new L.Point(x+w,y+h)),
+                map.containerPointToLatLng(new L.Point(x,y+h)),
+                map.containerPointToLatLng(new L.Point(x,y)),
+            ]
+            var pts_str = _.map(pts_ll, function(ll){
+                return ll.lat+' '+ll.lng;
+            }).join(',');
+            
+            var wkt = 'POLYGON(('+pts_str+'))';
+            $('#info_wkt').text(wkt);
+        };
+        
+        $img.on('load', function(evt){
+            
+            var nw = img.naturalWidth;
+            var nh = img.naturalHeight;
+            var ts = 200
+            var ratio = nw/nh;
+            
+            var w = (nw > nh) ? ts : (nw * ts / nh);
+            var h = (nh >= nw) ? ts : (nh * ts / nw);
+            
+            $img.css({
+                opacity:'0.7',
+                width: w + 'px',
+                height: h + 'px',
+                'z-index':10,
+            });
+            
+            $handle = $('<div />').addClass('ui-resizable-handle ui-resizable-se');
+            $handle.css({
+                width:'6px',
+                height:'6px',
+                'background-color':'red',
+            });
+            
+            
+            $wrapper.css({
+//                 position:'absolute',
+                top: '32px',
+                left:'32px',
+                width: (w) + 'px',
+                height: (h) + 'px',
+                border:'1px solid blue',
+            });
+            $img.appendTo($wrapper);
+            $handle.appendTo($wrapper);
+            $wrapper.appendTo('body');
+            
+            $wrapper.resizable({ 
+                handles: {se:$handle},
+                aspectRatio: ratio ,
+                containment: '#map',
+                alsoResize: $img,
+            });
+            $wrapper.draggable();
+            
+            updateGeometry();
+            
+            
+            $wrapper.on('resize', function(evt, ui){
+                $('#info_size').text(Math.floor(ui.size.width) +'+'+ui.size.height);
+//                 updateGeometry();
+            });
+            $wrapper.on('drag', function(evt,ui){
+                var pos = new L.Point(ui.offset.left, ui.offset.top);
+                var ll = map.containerPointToLatLng(pos);
+                $('#info_pos').text(ll);
+            });
+            $wrapper.on('resizestop',function(){ updateGeometry();});
+            $wrapper.on('dragstop',function(){ updateGeometry();});
+            
+            
+            $('#submit').on('click', function(evt){
+                var E = $wrapper;
+                var x = E.position().left;
+                var y = E.position().top;
+                var w = E.width();
+                var h = E.height();
+                
+                var pts_ll = [
+                    map.containerPointToLatLng(new L.Point(x,y)),
+                    map.containerPointToLatLng(new L.Point(x+w,y)),
+                    map.containerPointToLatLng(new L.Point(x+w,y+h)),
+                    map.containerPointToLatLng(new L.Point(x,y+h)),
+                    map.containerPointToLatLng(new L.Point(x,y)),
+                ]
+                
+                var polyline = L.polyline(pts_ll, {color: 'red'}).addTo(map);
+//                 map.fitBounds(polyline.getBounds());
+            });
+            
+        });
+        
+        
+        var reader = new FileReader();
+        reader.onload = (function(aImg) { 
+                            return function(e) 
+                            { 
+                                aImg.src = e.target.result; 
+                            }; 
+                        })(img);
+                        
+        reader.readAsDataURL(f);
+        
+        
+    }
+    
+    $('#f').on('change', handleFiles);
+
 })
 
 </script>
@@ -41,5 +196,15 @@ Zepto(function($){
 <body>
 <!-- <img src="test.png"  id="img"></img> -->
 <div id="map"></div>
+<div id="box">
+
+<input type="file" id="f"></input>
+<button id="submit" >SUBMIT</button>
+
+<div id="info_size"></div>
+<div id="info_pos"></div>
+<div id="info_wkt"></div>
+
+</div>
 </body>
 </html>

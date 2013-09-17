@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<title>GeoImage List</title>
+<style>
+
+.container{
+    margin-top:64px;
+}
+
+</style>
+<link rel="stylesheet" 
+    href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+</link>
+</head>
+<body>
+<div class="container">
+{% block content %}
+    <h2>Images</h2>
+    
+    {% for image in object_list %}
+    <div class="col-sm-6 col-md-3">
+        <div class="thumbnail">
+            <img src="{{image.img_thumbnail}}" />
+            <div class="caption">
+            <h3>{{image.pk}}</h3>
+                <p>
+                <a href="{% url 'image_update' pk=image.pk %}" 
+                    class="btn btn-default">Editer</a>
+                <a href="{% url 'image_delete' pk=image.pk %}" 
+                    class="btn btn-warning">Supprimer...</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+        
+{% endblock %}
+</body>
+</html>
