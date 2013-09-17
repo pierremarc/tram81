@@ -31,6 +31,12 @@
     height:120px;
 }
 
+#footer{
+    position:absolute;
+    bottom:0;
+    right:0;
+}
+
 </style>
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
@@ -75,7 +81,7 @@ jQuery(document).ready(function($){
             
             var wkt = 'POLYGON(('+pts_str+'))';
             $('#wkt').val(wkt);
-            $('#info_wkt').text(wkt);
+//             $('#info_wkt').text(wkt);
         };
     //////////////////////////////////
     
@@ -227,7 +233,9 @@ jQuery(document).ready(function($){
     {% endif %}
     base_layer.addTo(map);
     $('#f').on('change', handleFiles);
-    
+    $('#form_add').on('submit', function(evt){
+        updateGeometry();
+    });
 })
 
 </script>
@@ -238,30 +246,33 @@ jQuery(document).ready(function($){
 <div id="map"></div>
 <div id="box">
 
-
+{% if object %}
+<form id="form_add" method="POST" action="{% url 'image_update' pk=object.pk %}" enctype="multipart/form-data">
+{% else %}
 <form id="form_add" method="POST" action="{% url 'image_add' %}" enctype="multipart/form-data">
+{% endif %}
 {% csrf_token %}
     <input name="geom" type="hidden" id="wkt" value="{%if object%}{{object.geom.wkt}}{% endif %}"></input>
-    {% if object %}
-    <input name="pk" type="hidden" id="pk" value="{{object.pk}}"></input>
-    {% endif %}
     <div class="form-group">
-        {% if object %}
-        <label for="f">L'image a inserer
-            <div>
-                Celle ci remplacera
-                <img class="thumbnail current_thumbnail" src="{{object.img_thumbnail}}"></img>
-            </div>
+        <label for="f">
+            Image a inserer
+            {% if object %}
+                <div>
+                    <em>Celle ci remplacera</em>
+                    <img class="thumbnail current_thumbnail" src="{{object.img_thumbnail}}"></img>
+                </div>
+            {% endif %}
         </label>
-        {% endif %}
         <input name="image" type="file" id="f" ></input>
     </div>
     <button type="submit" class="btn btn-primary" id="submit" >enregistrer</button>
 </form>
 
-<!--<div id="info_size"></div>
-<div id="info_pos"></div>
-<div id="info_wkt"></div>-->
+<p id="footer" class="text-right">
+<a href="{% url 'image_add' %}" class="btn btn-link">Ajouter une image</a>
+<a href="{% url 'image' %}" class="btn btn-link">Liste des images</a>
+</p>
+
 
 
 

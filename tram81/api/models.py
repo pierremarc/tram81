@@ -16,7 +16,7 @@ class GeoImage(models.Model):
         return self.image.url
     
     def get_absolute_url(self):
-        return reverse('image_data', kwargs={'pk': self.pk})
+        return reverse('image_update', kwargs={'pk': self.pk})
 
     @property
     def img_thumbnail(self):
