@@ -23,7 +23,7 @@ Zepto(function($){
 //     var $img = $('#img');
 
     var map = L.map('map').setView([50.854075572144815, 4.38629150390625], 13);
-    L.tileLayer('http://127.0.0.1:8000/tile/{z}/{x}/{y}', {
+    L.tileLayer('{{TILE_SERVER}}', {
     attribution: 'Me',
     maxZoom: 18
 }).addTo(map);
