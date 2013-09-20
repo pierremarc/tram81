@@ -24,6 +24,8 @@ def image_data(req, pk):
     ret['height'] = im.height
     ret['width'] = im.width
     ret['geometry'] = json.loads(im.geom.geojson)
+    ret['text'] = im.text
+    ret['pub_date'] = im.pub_date
     
     return HttpResponse(json.dumps(ret), content_type="text/plain")
 
@@ -31,7 +33,7 @@ def image_data(req, pk):
 
 class ImageCreate(CreateView):
     model = GeoImage
-    fields = ['image','geom']
+    fields = ['image','geom', 'pub_date', 'text']
     
     def get_context_data(self, **kwargs):
         context = super(ImageCreate, self).get_context_data(**kwargs)
@@ -40,7 +42,7 @@ class ImageCreate(CreateView):
 
 class ImageUpdate(UpdateView):
     model = GeoImage
-    fields = ['image','geom']
+    fields = ['image','geom', 'pub_date', 'text']
     
     def get_context_data(self, **kwargs):
         context = super(ImageUpdate, self).get_context_data(**kwargs)

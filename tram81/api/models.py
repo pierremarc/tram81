@@ -1,6 +1,8 @@
 from django.contrib.gis.db import models
 from django.core.urlresolvers import reverse
 
+from datetime import date
+
 class GeoImage(models.Model):
     
     height = models.IntegerField(default=0, editable=False)
@@ -11,6 +13,10 @@ class GeoImage(models.Model):
                               max_length=124)
     geom = models.PolygonField(srid=4326)
     objects = models.GeoManager()
+    
+    
+    text = models.TextField(default=u'')
+    pub_date = models.DateField(default=date.today)
 
     def __str__(self): 
         return self.image.url

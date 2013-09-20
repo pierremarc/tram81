@@ -41,6 +41,7 @@
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"></link>
+<link rel="stylesheet" href="{{STATIC_URL}}datepicker/css/datepicker.css"></link>
 <!--[if lte IE 8]>
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
 <![endif]-->
@@ -48,9 +49,20 @@
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+<script src="{{STATIC_URL}}datepicker/js/bootstrap-datepicker.js"></script>
 <script>
 
 jQuery(document).ready(function($){
+
+    var $d = $('#d');
+    $d.datepicker({
+        format:'yyyy-mm-dd',
+        weekStart:1,
+    });
+    $d.on('changeDate',function(){
+        $d.datepicker('hide');
+    });
+
     var cur_geom = undefined;
     {% if object %} {% autoescape off %}
         cur_geom = JSON.parse('{{object.geom.geojson}}');
@@ -265,6 +277,23 @@ jQuery(document).ready(function($){
         </label>
         <input name="image" type="file" id="f" ></input>
     </div>
+    
+    
+    <div class="form-group">
+        <label for="d">
+            Date de publication
+        </label>
+        <input class="form-control" name="pub_date" type="text" id="d" value="{% if object %}{{ object.pub_date|date:'c' }}{% endif %}" ></input>
+    </div>
+    
+    <div class="form-group">
+        <h3>
+            Texte
+        </h3>
+        <textarea class="form-control" name="text" rows="8">{{ object.text|default:'' }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary" id="submit" >enregistrer</button>
+    
     <button type="submit" class="btn btn-primary" id="submit" >enregistrer</button>
 </form>
 
