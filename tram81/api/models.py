@@ -15,7 +15,7 @@ class GeoImage(models.Model):
     objects = models.GeoManager()
     
     
-    text = models.TextField(default=u'')
+    text = models.TextField(default=u'', blank=True)
     pub_date = models.DateField(default=date.today)
 
     def __str__(self): 

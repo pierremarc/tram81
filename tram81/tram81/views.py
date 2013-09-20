@@ -19,12 +19,15 @@
 from django.views.generic import TemplateView
 from django.conf import settings
 
+from api.models import GeoImage
+
 class IndexView(TemplateView):
     template_name = "base.html"
     
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
         context['TILE_SERVER'] = settings.TILE_SERVER
+        context['images'] = GeoImage.objects.all().order_by('pub_date')
         return context
     
     

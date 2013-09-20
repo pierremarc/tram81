@@ -59,8 +59,15 @@ jQuery(document).ready(function($){
         format:'yyyy-mm-dd',
         weekStart:1,
     });
-    $d.on('changeDate',function(){
+    {% if object %}
+    $d.val('{{ object.pub_date|date:'c' }}');
+    {% else %}
+    $d.val('{{ TODAY|date:'c' }}');
+    {% endif %}
+    
+    $d.on('changeDate',function(evt){
         $d.datepicker('hide');
+        $d.attr('value', $d.val().trim());
     });
 
     var cur_geom = undefined;
@@ -283,7 +290,7 @@ jQuery(document).ready(function($){
         <label for="d">
             Date de publication
         </label>
-        <input class="form-control" name="pub_date" type="text" id="d" value="{% if object %}{{ object.pub_date|date:'c' }}{% endif %}" ></input>
+        <input class="form-control" name="pub_date" type="text" id="d" value="" ></input>
     </div>
     
     <div class="form-group">

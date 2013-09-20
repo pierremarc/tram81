@@ -16,24 +16,35 @@
 
 <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
 <script src="{{STATIC_URL}}zepto.js"></script>
+<!-- <script src="{{STATIC_URL}}tram81.js"></script> -->
 <script>
 
+{% autoescape off %}
+window.T81 = {};
+window.T81.config = {
+    TILE_SERVER: '{{TILE_SERVER}}',
+};
+window.T81.data = [
+{% for image in images %}
+{
+    url: '{{ image.image.url }}',
+    geo: '{{ image.geom.geojson }}',
+    txt: '{{ image.text|escapejs }}',
+    pub: new Date('{{ image.pub_date|date:"c" }}'),
+},
+{% endfor %}
+];
+
+{% endautoescape %}
 Zepto(function($){
-
-//     var $img = $('#img');
-
+    
     var map = L.map('map').setView([50.854075572144815, 4.38629150390625], 13);
-    L.tileLayer('{{TILE_SERVER}}', {
-    attribution: 'Me',
-    maxZoom: 18
-}).addTo(map);
+        L.tileLayer(window.T81.config.TILE_SERVER, {
+        attribution: 'Me',
+        maxZoom: 28
+    }).addTo(map);
 
-//     var map = L.map('map').setView([50.854075572144815, 4.38629150390625], 13);
-//     L.tileLayer('http://xvm-5-152.ghst.net:2001/tile/tram81/{z}/{x}/{y}.png', {
-//     attribution: 'Me',
-//     maxZoom: 18
-// }).addTo(map);
-})
+});
 
 </script>
 </head>
