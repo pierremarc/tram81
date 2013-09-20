@@ -12,6 +12,8 @@ from .models import *
 class ImageList(ListView):
     model = GeoImage
     
+    def get_queryset(self):
+        return GeoImage.objects.all().order_by('-pub_date')
 
 def image_data(req, pk):
     try:

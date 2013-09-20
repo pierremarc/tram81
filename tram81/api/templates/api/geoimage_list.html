@@ -23,7 +23,7 @@
         <div class="thumbnail">
             <img src="{{image.img_thumbnail}}" />
             <div class="caption">
-            <h3>{{image.pk}}</h3>
+            <h4>{{ image.pub_date|date:"d.m.Y" }}</h4>
                 <p>
                 <a href="{% url 'image_update' pk=image.pk %}" 
                     class="btn btn-default">Editer</a>
