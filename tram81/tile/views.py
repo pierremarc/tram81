@@ -7,6 +7,8 @@ from django.conf import settings
 from django.http import HttpResponse, Http404
 from django.contrib.gis.geos import Polygon, MultiPolygon
 
+from .models import RiakCache
+
 
 import mapnik
 mapnik.logger.set_severity(mapnik.severity_type.Error)
@@ -142,6 +144,7 @@ class ImageMixer(object):
 class Map(object):
     
     root = os.path.join(settings.MEDIA_ROOT, 'tiles')
+    cache = RiakCache()
     
     def __init__(self):
         print 'CREATE MAP: %s'%(settings.MAPNIK_MAPFILE,)
@@ -191,41 +194,52 @@ class Map(object):
             
         
         
-    def get_tile_path(self, z, x, y, image_type='png'):
+    #def get_tile_path(self, z, x, y, image_type='png'):
+        #sx = str(x)
+        #sy = str(y)
+        #sz = str(z)
+        #tile_dir =  os.path.join(self.root, sz, sx)
+        #tile_name = '.'.join([sz,sx,sy, image_type])
+        #tile_path = os.path.join(self.root, tile_name)
+        ##if not os.path.exists(tile_dir):
+            ##os.makedirs(tile_dir)
+        #if not os.path.exists(tile_path):
+            #im = self.get_tile(z,x,y)
+            #im.save(tile_path, image_type)
+            
+        #return tile_path
+    
+    def get_tile(self, z, x, y):
         sx = str(x)
         sy = str(y)
         sz = str(z)
-        tile_dir =  os.path.join(self.root, sz, sx)
-        tile_name = '.'.join([sz,sx,sy, image_type])
-        tile_path = os.path.join(self.root, tile_name)
-        #if not os.path.exists(tile_dir):
-            #os.makedirs(tile_dir)
-        if not os.path.exists(tile_path):
-            im = self.get_tile(z,x,y)
-            im.save(tile_path, image_type)
-            
-        return tile_path
-    
-    def get_tile(self, z, x, y):
-        self.mutex.acquire()
+        cname = '.'.join([sz,sx,sy])
+        if self.cache.HAS(cname):
+            return self.cache.GET(cname)
         
+        miny, minx = tile_to_longlat(x ,y ,z)
+        maxy, maxx = tile_to_longlat(x + 1, y + 1, z)
+        bounds = dict(miny=miny, minx=minx, maxy=maxy, maxx=maxx)
+        tile = self._get_tile(z,x,y, bounds).tostring('png')
+        self.cache.PUT(cname, bounds, tile)
+        return tile
+    
+    def _get_tile(self, z, x, y, bounds):
+        self.mutex.acquire()
         try:
             ts = settings.MAPNIK_TILE_SIZE
             self.map.resize(ts, ts)
             
-            miny, minx = tile_to_longlat(x ,y ,z)
-            maxy, maxx = tile_to_longlat(x + 1, y + 1, z)
-            
-            bbox = mapnik.Box2d(minx, miny, maxx, maxy)
+            bbox = mapnik.Box2d(bounds['minx'], 
+                                bounds['miny'], 
+                                bounds['maxx'], 
+                                bounds['maxy'])
             map_bbox = self.transform.forward(bbox)
             
             self.map.zoom_to_box(map_bbox)
             if(self.map.buffer_size < (ts/2)):
                 self.map.buffer_size = ts / 2
                 
-            #for l in self.map.layers:
-                #print '%s %d'%(l.name, len(l.datasource.all_features()))
-            
             im = mapnik.Image(ts , ts )
             mapnik.render(self.map, im, 1, 0, 0)
         finally:
@@ -256,7 +270,7 @@ def get_tile(request, z,x,y):
     
     buf = map_pool.get_map().get_tile(int(z),
                             int(x),
-                            int(y)).tostring('png')
+                            int(y))
     response = HttpResponse()
     response['Content-length'] = len(buf)
     response['Content-Type'] = "image/png"
