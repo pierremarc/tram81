@@ -1,7 +1,6 @@
 from django.conf import settings
 
 
-
 class BaseCache(object):
     """
     
@@ -15,7 +14,7 @@ class BaseCache(object):
     def GET(self, key):
         raise NotImplementedError()
     
-    def REMOVE(self, bounds):
+    def DELETE(self, bounds):
         raise NotImplementedError()
     
     
@@ -45,26 +44,22 @@ class RiakCache(BaseCache):
     def GET(self, key):
         return self.bucket.get(key).encoded_data
     
-    def REMOVE(self, bounds):
+    def DELETE(self, bounds):
         mr = self.riak.RiakMapReduce(self.client)
-        mr.add_bucket(self.index)
+        mr.add_bucket(self.index.name)
         mr.map("""function(v, keyData, arg){
                 var data = JSON.parse(v.values[0].data);
                 
                 function intersects(A, B){
-                    return(
-                        A.minx <= B.maxx
-                        && B.minx <= A.maxx
-                        && A.maxy <= B.miny
-                        && B.maxy <= A.miny
-                    );
+                    return ( A.minx <= B.maxx && B.minx <= A.maxx && A.maxy <= B.miny && B.maxy <= A.miny );
                 };
-                if(intersects(data, arg)){
+               //        ejsLog('/tmp/map_reduce.log', JSON.stringify({d:data,a:arg}))
+                if(data && arg && intersects(data, arg)){
                     return [v.key];
                 }
                 return [];
-            };""")
-        mr.reduce("""function(v){ return v; };""")
+            }""", {'arg':bounds})
+        mr.reduce("""function(v){ return v; }""")
         
         for key in mr.run():
             print 'About to remove tile %s'%(key,)

@@ -1,5 +1,8 @@
 from django.contrib.gis.db import models
 from django.core.urlresolvers import reverse
+from django.db.models.signals import pre_save, post_save
+
+from tile.models import RiakCache
 
 from datetime import date
 
@@ -35,4 +38,33 @@ class GeoImage(models.Model):
         from easy_thumbnails.files import get_thumbnailer
         options = {'size': (360 *3, 240 *3), 'crop': 'smart'}
         return get_thumbnailer(self.image).get_thumbnail(options).url
+        
+        
+        
+        
+        
+def get_bounds(poly):
+    x_pts = [t[0] for t in poly.envelope.coords[0]]
+    y_pts = [t[1] for t in poly.envelope.coords[0]]
+    minx = reduce(lambda a,b: min(a,b), x_pts)
+    maxx = reduce(lambda a,b: max(a,b), x_pts)
+    miny = reduce(lambda a,b: min(a,b), y_pts)
+    maxy = reduce(lambda a,b: max(a,b), y_pts)
+    return dict(minx=minx,miny=miny, maxx=maxx, maxy=maxy)
+        
+def invalidate_current(sender, **kwargs):
+    c = RiakCache()
+    instance = kwargs['instance']
+    if instance.id:
+        obj = GeoImage.objects.get(pk=instance.id)
+        c.DELETE(get_bounds(obj.geom))
+        
+def invalidate_new(sender, **kwargs):
+    c = RiakCache()
+    instance = kwargs['instance']
+    c.DELETE(get_bounds(instance.geom))
+    
+pre_save.connect(invalidate_current, sender=GeoImage, weak=False, dispatch_uid='tram81.geoimage.ic')
+post_save.connect(invalidate_new, sender=GeoImage, weak=False, dispatch_uid='tram81.geoimage.in')
+        
         
