@@ -32,7 +32,10 @@ def tile_to_longlat(x, y, z):
 EPSG_3857_PROJ = mapnik.Projection('+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs')
 LONGLAT_PROJ = mapnik.Projection('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs')
 
-IntBox = namedtuple('Box',('minx','miny','maxx','maxy'), verbose=True)
+IntBox = namedtuple('Box',('minx','miny','maxx','maxy'), verbose=False)
+
+def box_is_valid(ib):
+    return ib.maxx > ib.minx and ib.maxy > ib.miny
 
 def box_to_poly(box):
     bl = (box.minx,box.miny)
@@ -59,11 +62,12 @@ class ImageMixer(object):
     
     
     def op_multiply(self, base, top, base_box, top_box):
+        if not box_is_valid(base_box) or not box_is_valid(top_box):
+            return
         bpix = base.load()
         #tpix = top.load()
-        
-        print base_box
-        print top_box
+        #print base_box
+        #print top_box
         
         byy = range(base_box.maxy -1, base_box.miny -1, -1)
         bxx = range(base_box.minx, base_box.maxx)

@@ -73,7 +73,7 @@ Zepto(function($){
     };
     
     var cur_idx = undefined;
-    
+    var images = [];
     function createLayer(data, idx){
         var l = new L.geoJson(data.geo,{
             style: function (feature) {
@@ -117,64 +117,64 @@ Zepto(function($){
             });
         });
         
-        var rects = [];
-        function debug(){
-            var first_base = undefined;
-            var zoom = map.getZoom();
-             _.each(rects, function(R){
-                map.removeLayer(R);
-             });
-             rects = [];
-            $.getJSON('http://tram81.localdomain/api/image/debug/12/'+zoom, function(data){
-                _.each(data.data, function(bnd, idx){
-                    var southWest = new L.LatLng(bnd.bounds.miny, bnd.bounds.minx),
-                        northEast = new L.LatLng(bnd.bounds.maxy, bnd.bounds.maxx);
-                    var llb = new L.LatLngBounds(southWest, northEast);
-                    if(!first_base)
-                    {
-                        first_base = llb;
-                    }
-                    else
-                    {
-                        first_base.extend(llb);
-                    }
-                    if(idx + 1 >= data.data.length)
-                    {
-    //                     map.fitBounds(first_base);
-                    }
-//                     if(parseInt(bnd.z) !== zoom)
+//         var rects = [];
+//         function debug(){
+//             var first_base = undefined;
+//             var zoom = map.getZoom();
+//              _.each(rects, function(R){
+//                 map.removeLayer(R);
+//              });
+//              rects = [];
+//             $.getJSON('http://tram81.localdomain/api/image/debug/12/'+zoom, function(data){
+//                 _.each(data.data, function(bnd, idx){
+//                     var southWest = new L.LatLng(bnd.bounds.miny, bnd.bounds.minx),
+//                         northEast = new L.LatLng(bnd.bounds.maxy, bnd.bounds.maxx);
+//                     var llb = new L.LatLngBounds(southWest, northEast);
+//                     if(!first_base)
 //                     {
-//                         return;
+//                         first_base = llb;
 //                     }
-//                     console.log(llb.toBBoxString());
-                    var col = bnd.damaged ? "#ff0000":'#0000ff';
-                    var b = new L.rectangle(llb, {
-                                    color: col, 
-                                    weight: 1,
-                                    fill:true,
-                                    fillColor:col,
-                                    });
-                    b.bindPopup(bnd.key);
-                        b.addTo(map);
-                    rects.push(b);
-                    
-                });
-                
-                var southWest = new L.LatLng(data.base.miny, data.base.minx),
-                        northEast = new L.LatLng(data.base.maxy, data.base.maxx);
-                    var llb = new L.LatLngBounds(southWest, northEast);
-                var b = new L.rectangle(llb, {
-                                    color: "#00ff00", 
-                                    weight: 1,
-                                    fill:true,
-                                    fillColor:"#00ff00",
-                                    });
-                        b.addTo(map);
-                    rects.push(b);
-            });
-        };
-        debug();
-        map.on('zoomend', debug);
+//                     else
+//                     {
+//                         first_base.extend(llb);
+//                     }
+//                     if(idx + 1 >= data.data.length)
+//                     {
+//     //                     map.fitBounds(first_base);
+//                     }
+// //                     if(parseInt(bnd.z) !== zoom)
+// //                     {
+// //                         return;
+// //                     }
+// //                     console.log(llb.toBBoxString());
+//                     var col = bnd.damaged ? "#ff0000":'#0000ff';
+//                     var b = new L.rectangle(llb, {
+//                                     color: col, 
+//                                     weight: 1,
+//                                     fill:true,
+//                                     fillColor:col,
+//                                     });
+//                     b.bindPopup(bnd.key);
+//                         b.addTo(map);
+//                     rects.push(b);
+//                     
+//                 });
+//                 
+//                 var southWest = new L.LatLng(data.base.miny, data.base.minx),
+//                         northEast = new L.LatLng(data.base.maxy, data.base.maxx);
+//                     var llb = new L.LatLngBounds(southWest, northEast);
+//                 var b = new L.rectangle(llb, {
+//                                     color: "#00ff00", 
+//                                     weight: 1,
+//                                     fill:true,
+//                                     fillColor:"#00ff00",
+//                                     });
+//                         b.addTo(map);
+//                     rects.push(b);
+//             });
+//         };
+//         debug();
+//         map.on('zoomend', debug);
 //         l.on('mouseout', function(evt){
 //         console.log('OUT', cur_idx);
 //             cur_idx = -1;
