@@ -41,11 +41,15 @@ Zepto(function($){
 
     var $map = $('#map');
     var map = L.map('map').setView([50.854075572144815, 4.38629150390625], 13);
-        L.tileLayer(window.T81.config.TILE_SERVER, {
+    L.tileLayer(window.T81.config.TILE_SERVER, {
         attribution: 'Me',
         maxZoom: 28
     }).addTo(map);
     
+//     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+//     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+// }).addTo(map);
+//     
     function px(i){
         return i + 'px';
     };
@@ -112,6 +116,65 @@ Zepto(function($){
                 map.on(ename, function(evt){mapElement(that);})
             });
         });
+        
+        var rects = [];
+        function debug(){
+            var first_base = undefined;
+            var zoom = map.getZoom();
+             _.each(rects, function(R){
+                map.removeLayer(R);
+             });
+             rects = [];
+            $.getJSON('http://tram81.localdomain/api/image/debug/12/'+zoom, function(data){
+                _.each(data.data, function(bnd, idx){
+                    var southWest = new L.LatLng(bnd.bounds.miny, bnd.bounds.minx),
+                        northEast = new L.LatLng(bnd.bounds.maxy, bnd.bounds.maxx);
+                    var llb = new L.LatLngBounds(southWest, northEast);
+                    if(!first_base)
+                    {
+                        first_base = llb;
+                    }
+                    else
+                    {
+                        first_base.extend(llb);
+                    }
+                    if(idx + 1 >= data.data.length)
+                    {
+    //                     map.fitBounds(first_base);
+                    }
+//                     if(parseInt(bnd.z) !== zoom)
+//                     {
+//                         return;
+//                     }
+//                     console.log(llb.toBBoxString());
+                    var col = bnd.damaged ? "#ff0000":'#0000ff';
+                    var b = new L.rectangle(llb, {
+                                    color: col, 
+                                    weight: 1,
+                                    fill:true,
+                                    fillColor:col,
+                                    });
+                    b.bindPopup(bnd.key);
+                        b.addTo(map);
+                    rects.push(b);
+                    
+                });
+                
+                var southWest = new L.LatLng(data.base.miny, data.base.minx),
+                        northEast = new L.LatLng(data.base.maxy, data.base.maxx);
+                    var llb = new L.LatLngBounds(southWest, northEast);
+                var b = new L.rectangle(llb, {
+                                    color: "#00ff00", 
+                                    weight: 1,
+                                    fill:true,
+                                    fillColor:"#00ff00",
+                                    });
+                        b.addTo(map);
+                    rects.push(b);
+            });
+        };
+        debug();
+        map.on('zoomend', debug);
 //         l.on('mouseout', function(evt){
 //         console.log('OUT', cur_idx);
 //             cur_idx = -1;

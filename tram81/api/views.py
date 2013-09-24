@@ -9,6 +9,8 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy
 from .models import *
 
+from api.models import get_bounds
+
 
 class ImageList(ListView):
     model = GeoImage
@@ -32,7 +34,33 @@ def image_data(req, pk):
     
     return HttpResponse(json.dumps(ret), content_type="text/plain")
 
+def intersects(A, B):
+    return A['minx'] <= B['maxx'] and B['minx'] <= A['maxx'] and A['miny'] <= B['maxy'] and B['miny'] <= A['maxy']
 
+def dbg_intersects(A, B, bid):
+    print '[%s]'%bid
+    print '%f <= %f = %s'%(A['minx'], B['maxx'], A['minx'] <= B['maxx'])
+    print '%f <= %f = %s'%(B['minx'], A['maxx'], B['minx'] <= A['maxx'])
+    print '%f <= %f = %s'%(A['miny'], B['maxy'], A['miny'] <= B['maxy'])
+    print '%f <= %f = %s'%(B['miny'], A['maxy'], B['miny'] <= A['maxy'])
+    print '>> %s'%(intersects(A, B),)
+        
+
+def debug_view(req, pk, zoom):
+    from tile.models import RiakCache
+    c = RiakCache()
+    g = GeoImage.objects.get(pk=int(pk))
+    base = get_bounds(g.geom)
+    ret = []
+    for keys in c.bucket.stream_keys():
+        for k in keys:
+            z, x, y = list(k.split('.'))
+            if z == zoom:
+                bounds = c.index.get(k).data
+                dbg_intersects(base, bounds, k)
+                ret.append(dict(key=k,x=x,y=y,z=z,bounds=bounds,damaged=intersects(base, bounds)))
+            
+    return HttpResponse(json.dumps({'data':ret, 'base':base}), content_type="text/plain")
 
 class ImageCreate(CreateView):
     model = GeoImage

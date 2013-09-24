@@ -164,6 +164,7 @@ class Map(object):
         
         self.proj = mapnik.Projection(self.map.srs)
         self.transform = mapnik.ProjTransform(LONGLAT_PROJ, self.proj)
+        self.inverse_transform = mapnik.ProjTransform(self.proj, LONGLAT_PROJ)
         
         #self.map.zoom_all()
         #self.inverse_transform = mapnik.ProjTransform(self.proj, LONGLAT_PROJ)
@@ -219,8 +220,9 @@ class Map(object):
         
         miny, minx = tile_to_longlat(x ,y ,z)
         maxy, maxx = tile_to_longlat(x + 1, y + 1, z)
-        bounds = dict(miny=miny, minx=minx, maxy=maxy, maxx=maxx)
-        tile = self._get_tile(z,x,y, bounds).tostring('png')
+        bounds_tms = dict(miny=miny, minx=minx, maxy=maxy, maxx=maxx)
+        bounds = dict(miny=maxy, minx=minx, maxy=miny, maxx=maxx)
+        tile = self._get_tile(z,x,y, bounds_tms).tostring('png')
         self.cache.PUT(cname, bounds, tile)
         return tile
     
@@ -242,6 +244,8 @@ class Map(object):
                 
             im = mapnik.Image(ts , ts )
             mapnik.render(self.map, im, 1, 0, 0)
+        except Exception:
+            pass
         finally:
             self.mutex.release()
 

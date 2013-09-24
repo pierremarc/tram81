@@ -1,5 +1,5 @@
 from django.conf import settings
-
+import  json
 
 class BaseCache(object):
     """
@@ -45,25 +45,60 @@ class RiakCache(BaseCache):
         return self.bucket.get(key).encoded_data
     
     def DELETE(self, bounds):
+        
+        def intersects(A, B):
+            return A['minx'] <= B['maxx'] and B['minx'] <= A['maxx'] and A['miny'] <= B['maxy'] and B['miny'] <= A['maxy']
+        
+        for keys in self.bucket.stream_keys():
+            for key in keys:
+                bnd = self.index.get(key).data
+                print '============================='
+                print '%s %s'%(bounds,bnd)
+                if bnd and intersects(bounds, bnd):
+                    print 'About to remove tile %s'%(key,)
+                    self.bucket.delete(key)
+                    self.index.delete(key)
+        
+        print 'END DELETE: %s'%(bounds)
+        return
+        
+        print 'START DELETE: %s'%(bounds)
         mr = self.riak.RiakMapReduce(self.client)
-        mr.add_bucket(self.index.name)
+        mr.add_bucket(self.bucket.name)
         mr.map("""function(v, keyData, arg){
                 var data = JSON.parse(v.values[0].data);
                 
                 function intersects(A, B){
-                    return ( A.minx <= B.maxx && B.minx <= A.maxx && A.maxy <= B.miny && B.maxy <= A.miny );
+                    return ( A.minx <= B.maxx 
+                                && B.minx <= A.maxx
+                                && A.maxy <= B.miny 
+                                && B.maxy <= A.miny );
                 };
-               //        ejsLog('/tmp/map_reduce.log', JSON.stringify({d:data,a:arg}))
-                if(data && arg && intersects(data, arg)){
+        
+               /* if(data 
+                    && arg 
+                    && intersects(data, arg)){
                     return [v.key];
-                }
-                return [];
+                } */
+                return [[intersects(data, arg), v.key]];
             }""", {'arg':bounds})
         mr.reduce("""function(v){ return v; }""")
         
-        for key in mr.run():
-            print 'About to remove tile %s'%(key,)
-            self.bucket.delete(key)
+        #result = mr.run()
+        #if result:
+            #for key in result:
+                #print 'About to remove tile %s'%(key,)
+                #self.bucket.delete(key)
+        for vals in mr.stream():
+            print vals
+            if vals[1]:
+                for val in vals[1]:
+                    if val[0]:
+                        print 'Keep %s'%(val[1],)
+                    else:
+                        print 'About to remove tile %s'%(val[1],)
+                        self.bucket.delete(key)
         
+        print 'END DELETE: %s'%(bounds)
         
         
