@@ -49,13 +49,20 @@ window.T81.config = {
 window.T81.data = [
 {% for image in images %}
 {
-    url: '{{ image.image.url }}',
+    url: '{% url 'index' pk=image.pk %}',
+    img_url: '{{ image.image.url }}',
     geo: JSON.parse('{{ image.geom.geojson }}'),
     txt: '{{ image.text|escapejs }}',
     pub: new Date('{{ image.pub_date|date:"c" }}'),
 },
 {% endfor %}
 ];
+
+{% if REQ_IMAGE %}
+var default_bounds = JSON.parse('{{ REQ_IMAGE.geom.geojson }}');
+{% else %}
+var default_bounds = undefined;
+{% endif %}
 
 {% endautoescape %}
 Zepto(function($){
@@ -129,12 +136,13 @@ Zepto(function($){
                 img: $('<img />').addClass('img'),
                 time: $('<div />').addClass('time_box'),
                 txt: $('<div />').addClass('txt_box'),
+                link: $('<div />').addClass('link_box'),
                 close: $('<close>fermer</close>').addClass('close_box'),
             };
-            ui.img.attr('src', this.data.url);
+            ui.img.attr('src', this.data.img_url);
             ui.time.html(this.data.pub);
             ui.txt.html(this.data.txt);
-            
+            ui.link.html('<a href="'+this.data.url+'">lien vers cette image</a>')
             ui.close.on('click',function(){$info.hide()});
             
             $info.empty();
@@ -147,7 +155,15 @@ Zepto(function($){
     _.each(window.T81.data, prepareLayers);
     var las_image = global_images[global_images.length -1].getBounds();
     map.once('load', function(){
-        map.fitBounds(las_image);
+        if(default_bounds)
+        {
+            var l = new L.geoJson(default_bounds);
+            map.fitBounds(l.getBounds());
+        }
+        else
+        {
+            map.fitBounds(las_image);
+        }
     });
     map.setView([50.854075572144815, 4.38629150390625], 13);
    

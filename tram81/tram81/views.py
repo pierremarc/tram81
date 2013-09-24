@@ -28,6 +28,10 @@ class IndexView(TemplateView):
         context = super(IndexView, self).get_context_data(**kwargs)
         context['TILE_SERVER'] = settings.TILE_SERVER
         context['images'] = GeoImage.objects.all().order_by('pub_date')
+        try:
+            context['REQ_IMAGE'] = GeoImage.objects.get(pk=context['pk'])
+        except Exception:
+            pass
         return context
     
     
