@@ -109,7 +109,7 @@ class ImageMixer(object):
             for geo_image in geo_images:
                 box = poly_to_box(geo_image.geom)
                 ibox = box.intersect(bbox)
-                if (ibox.width <= 0.0) or (ibox.height <= 0.0):
+                if not ibox.valid():
                     continue
                 
                 try:
