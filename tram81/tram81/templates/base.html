@@ -61,7 +61,7 @@ window.T81.data = [
 Zepto(function($){
     $('#info_box').hide();
     var $map = $('#map');
-    var map = L.map('map').setView([50.854075572144815, 4.38629150390625], 13);
+    var map = L.map('map');
     L.tileLayer(window.T81.config.TILE_SERVER, {
         attribution: 'Me',
         maxZoom: 28
@@ -145,6 +145,12 @@ Zepto(function($){
         });
     };
     _.each(window.T81.data, prepareLayers);
+    var las_image = global_images[global_images.length -1].getBounds();
+    map.once('load', function(){
+        map.fitBounds(las_image);
+    });
+    map.setView([50.854075572144815, 4.38629150390625], 13);
+   
 
 });
 
