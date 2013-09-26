@@ -13,13 +13,12 @@
 #info_box{
     position:absolute;
     z-index:2;
-    top:0;right:0;bottom:0;left:auto;
-    width:300px;
-
+    top:0;right:0;bottom:0;left:66%;
+/*     width:300px; */
     background-color: white;
     border-left: 2px solid grey;
     padding: 12px;
-
+    overflow: auto;
 }
 
 img.img{
@@ -49,6 +48,7 @@ window.T81.config = {
 window.T81.data = [
 {% for image in images %}
 {
+    pk: {{ image.pk }},
     url: '{% url 'index' pk=image.pk %}',
     img_url: '{{ image.image.url }}',
     geo: JSON.parse('{{ image.geom.geojson }}'),
@@ -65,14 +65,40 @@ var default_bounds = undefined;
 {% endif %}
 
 {% endautoescape %}
+
 Zepto(function($){
     $('#info_box').hide();
+    var panelIsVisible = false;
     var $map = $('#map');
     var map = L.map('map');
     L.tileLayer(window.T81.config.TILE_SERVER, {
         attribution: 'Me',
         maxZoom: 28
     }).addTo(map);
+    
+    
+    function showPanel(){
+        var $info = $('#info_box');
+        if(!panelIsVisible)
+        {
+            $info.css({opacity:'0'});
+            $info.show();
+            $info.animate({opacity:'1'},400,'ease-in');
+        }
+        panelIsVisible = true;
+        return $info;
+    };
+    function hidePanel(){
+        var $info = $('#info_box');
+        if(panelIsVisible)
+        {
+            $info.animate({opacity:'0'},400,'ease-out', function(){
+                $info.hide();
+            });
+        }
+        panelIsVisible = false;
+        return $info;
+    };
     
 //     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 //     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -114,6 +140,20 @@ Zepto(function($){
                     weight:2,
                     color:'#FFF400',
                     };
+                    
+    function resetDisqus(pk){
+        var $disqus = $('#disqus_thread');
+        DISQUS.reset({
+            reload: true,
+            config: function () {  
+                this.page.identifier = pk;
+                this.page.url = "http://tram81.be/" + pk;
+            }
+        });
+        $disqus.detach();
+        return $disqus;
+    };
+    
     var global_images = [];
     function prepareLayers(data, idx){
         var l = new L.geoJson(data.geo,{
@@ -143,13 +183,17 @@ Zepto(function($){
             ui.time.html(this.data.pub);
             ui.txt.html(this.data.txt);
             ui.link.html('<a href="'+this.data.url+'">lien vers cette image</a>')
-            ui.close.on('click',function(){$info.hide()});
+            ui.close.on('click',function(){hidePanel();});
             
+            var disqus = resetDisqus(this.data.pk);
             $info.empty();
             _.each(ui, function($el){
                 $info.append($el);
             });
-            $info.show();
+            $info.append(disqus);
+            
+//             $info.show();
+            showPanel();
         });
     };
     _.each(window.T81.data, prepareLayers);
@@ -171,12 +215,43 @@ Zepto(function($){
 });
 
 </script>
+
+
 </head>
 
 <body>
 
+<div id="disqus_thread"></div>
 <div id="map"></div>
 <div id="info_box"></div>
+
+<script type="text/javascript">
+
+    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+         // required: replace example with your forum shortname
+
+    var disqus_shortname = 'tram81';
+    {% if REQ_IMAGE %}
+    var disqus_identifier = '{{ REQ_IMAGE.pk }}';
+    var disqus_url = 'http://tram81.be/{{ REQ_IMAGE.pk }}';
+    {% else %}
+    var req_pk = window.T81.data[window.T81.data.length -1 ].pk;
+    var disqus_identifier = req_pk;
+    var disqus_url = 'http://tram81.be/'+req_pk;
+    {% endif %}
+    var disqus_developer = '1';
+
+    
+        var disqus_config = function () { 
+          this.language = "fr";
+        };
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
 
 </body>
 </html>
