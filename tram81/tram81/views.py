@@ -16,6 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import datetime
+
 from django.views.generic import TemplateView
 from django.conf import settings
 
@@ -29,9 +31,19 @@ class IndexView(TemplateView):
         context['TILE_SERVER'] = settings.TILE_SERVER
         context['images'] = GeoImage.objects.all().order_by('pub_date')
         try:
-            context['REQ_IMAGE'] = GeoImage.objects.get(pk=context['pk'])
-        except Exception:
-            pass
+            y = int(context['y'])
+            m = int(context['m'])
+            d = int(context['d'])
+            context['REQ_IMAGES'] = GeoImage.objects.filter(pub_date=datetime.date(y,m,d))
+        except Exception, ex:
+            print 'failed to get date : %s'%ex
+            try:
+                context['REQ_IMAGES'] = GeoImage.objects.filter(pk=context['pk'])
+            except Exception:
+                print 'failed to get pk'
+                for k in context:
+                    if not callable(context[k]):
+                         print '%s : %s'%(k,context[k])
+                pass
         return context
-    
     

@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>test</title>
+<title>Vous êtes là</title>
 <style>
 *{margin:0;border:none;padding:0}
 
@@ -53,6 +53,13 @@ img.img{
 <script>
 
 {% autoescape off %}
+function formatDate(d){
+    function pad(n){return n<10 ? '0'+n : n};
+    return d.getUTCFullYear()+'-'
+        + pad(d.getUTCMonth()+1)+'-'
+        + pad(d.getUTCDate());
+};
+
 window.T81 = {};
 window.T81.config = {
     TILE_SERVER: '{{TILE_SERVER}}',
@@ -65,15 +72,25 @@ window.T81.data = [
     img_url: '{{ image.image.url }}',
     geo: JSON.parse('{{ image.geom.geojson }}'),
     txt: '{{ image.text|escapejs }}',
-    pub: new Date('{{ image.pub_date|date:"c" }}'),
+    pub: formatDate(new Date('{{ image.pub_date|date:"c" }}')),
 },
 {% endfor %}
 ];
 
-{% if REQ_IMAGE %}
-var default_bounds = JSON.parse('{{ REQ_IMAGE.geom.geojson }}');
-{% else %}
 var default_bounds = undefined;
+
+{% if REQ_IMAGES %}
+(function(){
+    var rims = [];
+    {% for rim in REQ_IMAGES %}
+    rims.push(  new L.geoJson(JSON.parse('{{ rim.geom.geojson }}')) );
+    {% endfor %}
+    default_bounds = rims[0].getBounds();
+    _.each(rims,function(r){
+        default_bounds.extend(r.getBounds());
+    });
+})();
+
 {% endif %}
 
 {% endautoescape %}
@@ -88,6 +105,7 @@ Zepto(function($){
         maxZoom: 28
     }).addTo(map);
     
+
     
     function showPanel(){
         var $info = $('#info_box');
@@ -155,11 +173,13 @@ Zepto(function($){
                     
     function resetDisqus(pk){
         var $disqus = $('#disqus_thread');
+        document.title = document.title.split(' #').pop()  + ' #'+pk;
         DISQUS.reset({
             reload: true,
             config: function () {  
                 this.page.identifier = pk;
                 this.page.url = "http://tram81.be/" + pk;
+                this.page.title = pk;
             }
         });
         $disqus.detach();
@@ -191,11 +211,11 @@ Zepto(function($){
             var txt = {
                 close: $('<close>fermer</close>').addClass('close_box'),
                 time: $('<div />').addClass('time_box'),
-                txt: $('<div />').addClass('txt_box'),
+                txt: $('<div />').addClass('txt'),
                 link: $('<div />').addClass('link_box'),
             };
             
-            var disqus = resetDisqus(this.data.pk);
+            var disqus = resetDisqus(this.data.pub);
             
             var img = $('<img />').addClass('img')
             img.attr('src', this.data.img_url);
@@ -225,8 +245,7 @@ Zepto(function($){
     map.once('load', function(){
         if(default_bounds)
         {
-            var l = new L.geoJson(default_bounds);
-            map.fitBounds(l.getBounds());
+            map.fitBounds(default_bounds);
         }
         else
         {
@@ -255,20 +274,25 @@ Zepto(function($){
          // required: replace example with your forum shortname
 
     var disqus_shortname = 'tram81';
-    {% if REQ_IMAGE %}
-    var disqus_identifier = '{{ REQ_IMAGE.pk }}';
-    var disqus_url = 'http://tram81.be/{{ REQ_IMAGE.pk }}';
+    
+    {% if REQ_IMAGES %}
+    var ds = formatDate(new Date('{{ REQ_IMAGES.0.pub_date|date:"c" }}'))
+    var disqus_identifier = ds;
+    var disqus_title = ds;
+    var disqus_url = 'http://tram81.be/'+ds;
     {% else %}
-    var req_pk = window.T81.data[window.T81.data.length -1 ].pk;
+    var req_pk = window.T81.data[window.T81.data.length -1 ].pub;
+    var disqus_title = req_pk;
     var disqus_identifier = req_pk;
     var disqus_url = 'http://tram81.be/'+req_pk;
     {% endif %}
+    
     var disqus_developer = '1';
 
     
-        var disqus_config = function () { 
-          this.language = "fr";
-        };
+    var disqus_config = function () { 
+        this.language = "fr";
+    };
     /* * * DON'T EDIT BELOW THIS LINE * * */
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
