@@ -16,8 +16,7 @@
 <body>
 <div class="container">
 {% block content %}
-    <h2>Images</h2>
-    
+    <h2>Images  <a href="{% url 'image_add' %}">ajouter une image</a></h2>
     {% for image in object_list %}
     <div class="col-sm-6 col-md-3">
         <div class="thumbnail">
