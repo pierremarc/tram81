@@ -23,6 +23,8 @@ from django.conf import settings
 
 from api.models import GeoImage
 
+
+
 class IndexView(TemplateView):
     template_name = "base.html"
     

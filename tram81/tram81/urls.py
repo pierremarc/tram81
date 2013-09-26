@@ -7,7 +7,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^(?P<y>\d{4})-(?P<m>\d{2})-(?P<d>\d{2})$', IndexView.as_view(), name='index'),
+    url(r'^(?P<y>\d{4})-(?P<m>\d{2})-(?P<d>\d{2})$', IndexView.as_view(), name='archive'),
     url(r'^(?P<pk>\d*)$', IndexView.as_view(), name='index'),
     url(r'^api/', include('api.urls')),
     url(r'^tile/', include('tile.urls')),
