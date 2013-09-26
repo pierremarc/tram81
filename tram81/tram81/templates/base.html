@@ -13,17 +13,29 @@
 #info_box{
     position:absolute;
     z-index:2;
-    top:0;right:0;bottom:0;left:66%;
+/*     top:0;right:0;bottom:0;left:66%; */
+    top:32px;right:32px;bottom:32px;left:32px;
 /*     width:300px; */
     background-color: white;
-    border-left: 2px solid grey;
+    border: 2px solid grey;
     padding: 12px;
     overflow: auto;
 }
 
+.img_box{
+    position:absolute;
+    top:32px;right:auto;bottom:32px;left:32px;
+    width:50%;
+}
+
 img.img{
-width: 100%;
-height: auto;
+    width:100%;
+}
+
+.txt_box{
+    position:absolute;
+    top:32px;right:32px;bottom:32px;left:auto;
+    width:40%;
 }
 
 
@@ -173,24 +185,36 @@ Zepto(function($){
         l.on('click', function(evt){
             var $info = $('#info_box');
             var ui = {
-                img: $('<img />').addClass('img'),
+                img_box: $('<div />').addClass('img_box'),
+                txt_box: $('<div />').addClass('txt_box'),
+            };
+            var txt = {
+                close: $('<close>fermer</close>').addClass('close_box'),
                 time: $('<div />').addClass('time_box'),
                 txt: $('<div />').addClass('txt_box'),
                 link: $('<div />').addClass('link_box'),
-                close: $('<close>fermer</close>').addClass('close_box'),
             };
-            ui.img.attr('src', this.data.img_url);
-            ui.time.html(this.data.pub);
-            ui.txt.html(this.data.txt);
-            ui.link.html('<a href="'+this.data.url+'">lien vers cette image</a>')
-            ui.close.on('click',function(){hidePanel();});
             
             var disqus = resetDisqus(this.data.pk);
+            
+            var img = $('<img />').addClass('img')
+            img.attr('src', this.data.img_url);
+            
+            txt.time.html(this.data.pub);
+            txt.txt.html(this.data.txt);
+            txt.link.html('<a href="'+this.data.url+'">lien vers cette image</a>')
+            txt.close.on('click',function(){hidePanel();});
+            
+            ui.img_box.append(img);
+            _.each(txt, function($el){
+                ui.txt_box.append($el);
+            });
+            
             $info.empty();
             _.each(ui, function($el){
                 $info.append($el);
             });
-            $info.append(disqus);
+            ui.txt_box.append(disqus);
             
 //             $info.show();
             showPanel();
