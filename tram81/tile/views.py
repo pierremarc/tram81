@@ -75,9 +75,12 @@ class ImageMixer(object):
         sz = (base_box.maxx - base_box.minx, 
               base_box.maxy - base_box.miny)
         quad = ( top_box.minx, top_box.maxy - 1, # tl
-                top_box.minx, top_box.miny - 1,  # bl
-                top_box.maxx, top_box.miny - 1,  # br
+                top_box.minx, top_box.miny ,  # bl
+                top_box.maxx, top_box.miny ,  # br
                 top_box.maxx, top_box.maxy - 1)  # tr
+        #t_tmp = top.transform(sz, Image.QUAD, quad, Image.BICUBIC)
+        #tpix = t_tmp.load()
+        #t_tmp.save('debug.png')
         tpix = top.transform(sz, Image.QUAD, quad, Image.BICUBIC).load()
         
         for y_idx in xrange(len(byy)):
@@ -104,7 +107,7 @@ class ImageMixer(object):
         
         if geo_images:
             src_image = Image.open(StringIO(tile.tostring('png')))
-            base = Image.new(src_image.mode, src_image.size, "white")
+            #base = Image.new(src_image.mode, src_image.size, "white")
         
             for geo_image in geo_images:
                 box = poly_to_box(geo_image.geom)
@@ -131,14 +134,14 @@ class ImageMixer(object):
                 b_dy = self._ts(ibox.miny, bbox.maxy, bbox.miny, src_image.size[1])
                 B = round_box(mapnik.Box2d(b_ox, b_oy, b_dx, b_dy))
                 
-                self.op_multiply(base, im, B, O)
+                self.op_multiply(src_image, im, B, O)
                 
-            AB = round_box(mapnik.Box2d(0,0,base.size[0],base.size[1]))
-            self.op_multiply(base, src_image, AB, AB)
+            #AB = round_box(mapnik.Box2d(0,0,base.size[0],base.size[1]))
+            #self.op_multiply(base, src_image, AB, AB)
             
             f = StringIO()
             #base.transpose(Image.FLIP_TOP_BOTTOM).save(f, 'PNG')
-            base.save(f, 'PNG')
+            src_image.save(f, 'PNG')
             return mapnik.Image.fromstring(f.getvalue())
                 
         return tile
