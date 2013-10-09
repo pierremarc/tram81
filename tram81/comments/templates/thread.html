@@ -1,9 +1,15 @@
 {# threads #}
 {% load md %}
 <div class="comment-form">
+{% if user.is_authenticated %}
 <h3>Laisser un commentaire</h3>
 <textarea id="new_comment"></textarea>
 <div id="nc">envoyer</div>
+{% else %}
+<div class="login">
+Pour laisser un commentaire, <a href="{% url 'social:begin' 'facebook' %}">connecter vous</a> avec votre compte facebook;
+</div>
+{% endif %}
 </div>
 {% for comment in comments %}
 <div class="comment-box">

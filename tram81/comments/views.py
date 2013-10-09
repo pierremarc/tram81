@@ -36,7 +36,6 @@ class ThreadView(TemplateView):
         return context
 
 
-
 def create_comment(request):
     try:
         txt = request.POST['txt']
