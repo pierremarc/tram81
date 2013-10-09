@@ -116,6 +116,18 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    'social.apps.django_app.context_processors.backends',
+    'social.apps.django_app.context_processors.login_redirect',
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.core.context_processors.tz",
+    "django.contrib.messages.context_processors.messages",
+)
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -131,7 +143,9 @@ INSTALLED_APPS = (
     'tile',
     'api',
     'easy_thumbnails',
-    #'debug_toolbar',
+    'comments',
+    #'social.apps.django_app.default',
+    'debug_toolbar',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -162,7 +176,14 @@ LOGGING = {
         },
     }
 }
+        
+AUTHENTICATION_BACKENDS = (
+    'social.backends.facebook.FacebookOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
+#SOCIAL_AUTH_USER_MODEL = 'comments.models.Commenter'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
 
 try:
     from local_settings import *

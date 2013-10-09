@@ -1,0 +1,21 @@
+{# threads #}
+{% load md %}
+<div class="comment-form">
+<h3>Laisser un commentaire</h3>
+<textarea id="new_comment"></textarea>
+<div id="nc">envoyer</div>
+</div>
+{% for comment in comments %}
+<div class="comment-box">
+    <div class="commenter">
+    <a href="https://www.facebook.com/{{comment.commenter.get_username}}"
+        title="See on facebook">
+        {{ comment.commenter.get_full_name }}
+    </a>
+    </div>
+    <div class="comment-text">
+    {{ comment.content|md }}
+    </div>
+</div>
+{% endfor %}
+

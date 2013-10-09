@@ -1,365 +1,50 @@
-{% load md %}
 <html>
 <head>
-<title>Vous êtes là</title>
-<style>
-*{margin:0;border:none;padding:0}
-
-#map{
-    position:absolute;
-    z-index:1;
-    top:0;right:0;bottom:0;left:0;
-}
-
-#info_box{
-    position:absolute;
-    z-index:2;
-/*     top:0;right:0;bottom:0;left:66%; */
-    top:32px;right:32px;bottom:32px;left:32px;
-/*     width:300px; */
-    background-color: white;
-    border: 1px solid grey;
-    padding: 12px;
-    overflow: hidden;
-}
-
-.txt_box{
-    position:absolute;
-    top:32px;right:32px;bottom:32px;left:auto;
-    width:40%;
-    overflow: auto;
-    padding-right:6px;
-}
-
-.close_box{
-    position: absolute;
-    top: 0;
-    right: 6px;
-    color: #999;
-    font-family: sans-serif;
-    font-size:12pt;
-    cursor:pointer;
-}
-.close_box:hover{
-    border-bottom: 1px solid;
-}
-
-.comments{
-    color: #999;
-    font-family: sans-serif;
-    font-size:12pt;
-    cursor:pointer;
-}
-.comments:hover{
-    border-bottom: 1px solid;
-}
-
-.time_box{
-    font-family: sans-serif;
-    font-size: 16pt;
-    margin-bottom: 16px;
-    font-weight: bold;
-}
-.time_box a{
-    text-decoration:none;
-    color:black;
-}
-.time_box a:hover{
-    border-bottom:2px solid;
-}
-
-.txt{
-    margin-bottom: 16px;
-    font-family: sans-serif;
-    font-size: 12pt;
-    padding-right: 100px;
-}
-
-#disqus_thread{
-    padding:12px;
-    border: 15px solid #FCFCFC;
-}
-
-.img_box{
-    position:absolute;
-    top:32px;right:auto;bottom:32px;left:32px;
-    width:50%;
-}
-
-img.img{
-    width:100%;
-}
-
-
-
-
-
-</style>
-<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
-<!--[if lte IE 8]>
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
-<![endif]-->
-
-<script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
-<script src="{{STATIC_URL}}zepto.js"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
-<!-- <script src="{{STATIC_URL}}tram81.js"></script> -->
-<script>
-
-{% autoescape off %}
-function formatDate(d){
-    function pad(n){return n<10 ? '0'+n : n};
-    return d.getUTCFullYear()+'-'
-        + pad(d.getUTCMonth()+1)+'-'
-        + pad(d.getUTCDate());
-};
-
-window.T81 = {};
-window.T81.config = {
-    TILE_SERVER: '{{TILE_SERVER}}',
-};
-window.T81.data = [
-{% for image in images %}
-{
-    pk: {{ image.pk }},
-    url: '{% url 'index' pk=image.pk %}',
-    img_url: '{{ image.image.url }}',
-    geo: JSON.parse('{{ image.geom.geojson }}'),
-    txt: '{{ image.text|md|escapejs }}',
-    pub: formatDate(new Date('{{ image.pub_date|date:"c" }}')),
-},
-{% endfor %}
-];
-
-var default_bounds = undefined;
-
-{% if REQ_IMAGES %}
-(function(){
-    var rims = [];
-    {% for rim in REQ_IMAGES %}
-    rims.push(  new L.geoJson(JSON.parse('{{ rim.geom.geojson }}')) );
-    {% endfor %}
-    default_bounds = rims[0].getBounds();
-    _.each(rims,function(r){
-        default_bounds.extend(r.getBounds());
-    });
-})();
-
-{% endif %}
-
-{% endautoescape %}
-
-Zepto(function($){
-    $('#info_box').hide();
-    var panelIsVisible = false;
-    var $map = $('#map');
-    var map = L.map('map');
-    L.tileLayer(window.T81.config.TILE_SERVER, {
-        attribution: 'Me',
-        maxZoom: 28
-    }).addTo(map);
+    <title>Vous êtes là</title>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
+    <![endif]-->
+    <link rel="stylesheet" href="{{STATIC_URL}}tram81.css" />
     
+    <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+    <script src="{{STATIC_URL}}zepto.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
 
-    
-    function showPanel(){
-        var $info = $('#info_box');
-        if(!panelIsVisible)
-        {
-            $info.css({opacity:'0'});
-            $info.show();
-            $info.animate({opacity:'1'},400,'ease-in');
-        }
-        panelIsVisible = true;
-        return $info;
-    };
-    function hidePanel(){
-        var $info = $('#info_box');
-        if(panelIsVisible)
-        {
-            $info.animate({opacity:'0'},400,'ease-out', function(){
-                $info.hide();
-            });
-        }
-        panelIsVisible = false;
-        return $info;
-    };
-    
-//     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-//     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-// }).addTo(map);
-//     
-    function px(i){
-        return i + 'px';
-    };
-    
-    function mapElement(layer, append){
-        var bounds = layer.getBounds();
-        var $el = layer.$data_content;
-        $el.detach();
-        var NW = map.latLngToContainerPoint(bounds.getNorthWest());
-        var SE = map.latLngToContainerPoint(bounds.getSouthEast());
-        
-        var bb = new L.Bounds(NW, SE);
-        $el.css({
-            position:'absolute',
-            top:px(bb.min.y),
-            left:px(bb.min.x),
-            width:px(bb.getSize().x),
-            height:px(bb.getSize().y),
-        });
-        $map.append($el);
-    };
-
-    var standard_style = {
-                    fill:true,
-                    fillOpacity:0.0,
-                    stroke:false,
-                    clickable:true,
-                    };
-    var highlight_style = {
-                    fill:true,
-                    fillOpacity:0.0,
-                    stroke:true,
-                    clickable:true,
-                    weight:2,
-                    color:'#FFF400',
-                    };
-                    
-    function resetDisqus(pk){
-        var $disqus = $('#disqus_thread');
-        document.title = document.title.split(' #').pop()  + ' #'+pk;
-        DISQUS.reset({
-            reload: true,
-            config: function () {  
-                this.page.identifier = pk;
-                this.page.url = "http://tram81.be/" + pk;
-                this.page.title = pk;
-            }
-        });
-        $disqus.detach();
-        return $disqus;
-    };
-    
-    var global_images = [];
-    function prepareLayers(data, idx){
-        var l = new L.geoJson(data.geo,{
-            style: function (feature) {
-                return standard_style;
-            },
-        });
-        global_images.push(l);
-        l.data = data;
-        l.addTo(map);
-        l.on('mouseover', function(evt){
-            _.each(global_images, function(layer){
-                layer.setStyle(standard_style);
-            });
-            l.setStyle(highlight_style);
-        });
-        l.on('click', function(evt){
-            var $info = $('#info_box');
-            var ui = {
-                img_box: $('<div />').addClass('img_box'),
-                txt_box: $('<div />').addClass('txt_box'),
-            };
-            var txt = {
-                close: $('<close>fermer</close>').addClass('close_box'),
-                time: $('<div />').addClass('time_box'),
-                txt: $('<div />').addClass('txt'),
-//                 link: $('<div />').addClass('link_box'),
-                comments: $('<span>voir les commentaires</span>').addClass('comments'),
-            };
-            
-            var disqus = resetDisqus(this.data.pub);
-            disqus.hide();
-            var img = $('<img />').addClass('img')
-            img.attr('src', this.data.img_url);
-            var link = $('<a />').attr('href', this.data.url);
-            link.append(img);
-            
-            txt.time.html('<a href="/'+this.data.pub+'">'+this.data.pub+'</a>');
-            txt.txt.html(this.data.txt);
-            txt.close.on('click',function(){hidePanel();});
-            
-            ui.img_box.append(link);
-            _.each(txt, function($el){
-                ui.txt_box.append($el);
-            });
-            
-            $info.empty();
-            _.each(ui, function($el){
-                $info.append($el);
-            });
-            ui.txt_box.append(disqus);
-            
-            txt.comments.on('click',function(){
-                disqus.show();
-                this.remove();
-            });
-            
-            showPanel();
-        });
-    };
-    _.each(window.T81.data, prepareLayers);
-    var las_image = global_images[global_images.length -1].getBounds();
-    map.once('load', function(){
-        if(default_bounds)
-        {
-            map.fitBounds(default_bounds);
-        }
-        else
-        {
-            map.fitBounds(las_image);
-        }
-    });
-    map.setView([50.854075572144815, 4.38629150390625], 13);
-   
-
-});
-
-</script>
-
-
+    <script src="{% url 'js_conf' %}?ids={{REQ_IMAGES}}"></script>
 </head>
 
 <body>
+<div id="fb-root"></div>
+<script>
+  window.fbAsyncInit = function() {
+    // init the FB JS SDK
+    FB.init({
+      appId      : '{{FB_APP_ID}}',                        // App ID from the app dashboard
+      channelUrl : '{{STATIC_URL}}channel.html', // Channel file for x-domain comms
+      status     : true,                                 // Check Facebook Login status
+      xfbml      : true                                  // Look for social plugins on the page
+    });
 
-<div id="disqus_thread"></div>
+    // Additional initialization code such as adding Event Listeners goes here
+    FB.Event.subscribe('auth.authResponseChange', function(response) {
+        console.log('The status of the session is: ' + response.status);
+    });
+  };
+
+  // Load the SDK asynchronously
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/all.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+<!-- <a href="{% url 'social:begin' "facebook" %}">Facebook</a> -->
+
 <div id="map"></div>
 <div id="info_box"></div>
-
-<script type="text/javascript">
-
-    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-         // required: replace example with your forum shortname
-
-    var disqus_shortname = 'tram81';
-    
-    {% if REQ_IMAGES %}
-    var ds = formatDate(new Date('{{ REQ_IMAGES.0.pub_date|date:"c" }}'))
-    var disqus_identifier = ds;
-    var disqus_title = ds;
-    var disqus_url = 'http://tram81.be/'+ds;
-    {% else %}
-    var req_pk = window.T81.data[window.T81.data.length -1 ].pub;
-    var disqus_title = req_pk;
-    var disqus_identifier = req_pk;
-    var disqus_url = 'http://tram81.be/'+req_pk;
-    {% endif %}
-    
-    var disqus_developer = '1';
-
-    
-    var disqus_config = function () { 
-        this.language = "fr";
-    };
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
 
 </body>
 </html>

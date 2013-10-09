@@ -20,6 +20,7 @@ import datetime
 
 from django.views.generic import TemplateView
 from django.conf import settings
+from django.middleware.csrf import get_token
 
 from api.models import GeoImage
 
@@ -30,22 +31,37 @@ class IndexView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
-        context['TILE_SERVER'] = settings.TILE_SERVER
-        context['images'] = GeoImage.objects.all().order_by('pub_date')
+        
         try:
             y = int(context['y'])
             m = int(context['m'])
             d = int(context['d'])
-            context['REQ_IMAGES'] = GeoImage.objects.filter(pub_date=datetime.date(y,m,d))
+            req_images = GeoImage.objects.filter(pub_date=datetime.date(y,m,d))
         except Exception, ex:
-            print 'failed to get date : %s'%ex
             try:
-                context['REQ_IMAGES'] = GeoImage.objects.filter(pk=context['pk'])
+                req_images = GeoImage.objects.filter(pk=context['pk'])
             except Exception:
-                print 'failed to get pk'
-                for k in context:
-                    if not callable(context[k]):
-                         print '%s : %s'%(k,context[k])
-                pass
+                req_images = [GeoImage.objects.all().order_by('pub_date')[0]]
+        ids = []
+        for ri in req_images:
+            ids.append(str(ri.pk))
+        context['REQ_IMAGES'] = ','.join(ids)
+        context['FB_APP_ID'] = getattr(settings, 'SOCIAL_AUTH_FACEBOOK_KEY', '~')
         return context
     
+class JSConf(TemplateView):
+    template_name = "tram81.js"
+    
+    def get_context_data(self, **kwargs):
+        context = super(JSConf, self).get_context_data(**kwargs)
+        context['TILE_SERVER'] = settings.TILE_SERVER
+        context['images'] = GeoImage.objects.all().order_by('pub_date')
+        ids = self.request.GET['ids'].split(',')
+        context['REQ_IMAGES'] = GeoImage.objects.filter(pk__in=ids)
+        context['csrf'] = get_token(self.request)
+        
+        return context
+        
+        
+        
+        
