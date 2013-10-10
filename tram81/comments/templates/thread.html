@@ -2,25 +2,27 @@
 {% load md %}
 <div class="comment-form">
 {% if user.is_authenticated %}
-<h3>Laisser un commentaire</h3>
-<textarea id="new_comment"></textarea>
-<div id="nc">envoyer</div>
+    <h3>Laisser un commentaire</h3>
+    <div class="in-wrapper">
+        <textarea id="new_comment"></textarea>
+        <div class="button"><span id="nc">envoyer</span></div>
+    </div>
 {% else %}
-<div class="login">
-Pour laisser un commentaire, <a href="{% url 'social:begin' 'facebook' %}">connecter vous</a> avec votre compte facebook;
-</div>
+    <div class="login">
+    Pour laisser un commentaire, <a href="{% url 'social:begin' 'facebook' %}">connecter vous</a> avec votre compte facebook;
+    </div>
 {% endif %}
 </div>
 {% for comment in comments %}
 <div class="comment-box">
-    <div class="commenter">
-    <a href="https://www.facebook.com/{{comment.commenter.get_username}}"
-        title="See on facebook">
-        {{ comment.commenter.get_full_name }}
-    </a>
-    </div>
     <div class="comment-text">
     {{ comment.content|md }}
+    </div>
+    <div class="commenter">
+        <a href="https://www.facebook.com/{{comment.commenter.get_username}}"
+            title="See on facebook">
+            {{ comment.commenter.get_full_name }}
+        </a>
     </div>
 </div>
 {% endfor %}
