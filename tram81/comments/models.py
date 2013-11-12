@@ -26,7 +26,10 @@ def notifiy_comment(sender, **kwargs):
     message.append(u'New comment from: %s <https://www.facebook.com/%s>'%(cname, cid))
     message.append(u'In thread: http://tram81.be/%s'%(instance.thread,))
     message.append(instance.content)
-    mail_managers('New Comment', u'\n\n'.join(message))
+    try:
+        mail_managers('New Comment', u'\n\n'.join(message))
+    except Exception:
+        pass
     
     
 post_save.connect(notifiy_comment, sender=Comment)
