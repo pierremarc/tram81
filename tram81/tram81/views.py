@@ -41,7 +41,10 @@ class IndexView(TemplateView):
             try:
                 req_images = GeoImage.objects.filter(pk=context['pk'])
             except Exception:
-                req_images = [GeoImage.objects.all().order_by('-pub_date')[0]]
+                try:
+                    req_images = [GeoImage.objects.all().order_by('-pub_date')[0]]
+                except Exception:
+                    req_images = []
         ids = []
         for ri in req_images:
             ids.append(str(ri.pk))
