@@ -41,7 +41,7 @@ class IndexView(TemplateView):
             try:
                 req_images = GeoImage.objects.filter(pk=context['pk'])
             except Exception:
-                req_images = [GeoImage.objects.all().order_by('pub_date')[0]]
+                req_images = [GeoImage.objects.all().order_by('-pub_date')[0]]
         ids = []
         for ri in req_images:
             ids.append(str(ri.pk))
@@ -52,11 +52,16 @@ class IndexView(TemplateView):
 class JSConf(TemplateView):
     template_name = "tram81.js"
     
+    def render_to_response(self, context, **response_kwargs):
+        response_kwargs['content_type'] = 'text/javascript'
+        return super(TemplateView, self).render_to_response(context, **response_kwargs)
+    
     def get_context_data(self, **kwargs):
         context = super(JSConf, self).get_context_data(**kwargs)
         context['TILE_SERVER'] = settings.TILE_SERVER
         context['images'] = GeoImage.objects.all().order_by('pub_date')
         ids = self.request.GET['ids'].split(',')
+        print 'IDS: %s'%(ids,)
         context['REQ_IMAGES'] = GeoImage.objects.filter(pk__in=ids)
         context['csrf'] = get_token(self.request)
         
