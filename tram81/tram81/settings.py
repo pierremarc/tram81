@@ -187,6 +187,8 @@ AUTHENTICATION_BACKENDS = (
 #SOCIAL_AUTH_USER_MODEL = 'comments.models.Commenter'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
 
+LOGIN_URL='/admin/'
+
 try:
     from local_settings import *
 except ImportError:

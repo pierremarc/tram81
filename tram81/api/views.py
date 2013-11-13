@@ -7,12 +7,48 @@ from django.http import HttpResponse, Http404
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy
+from django.utils.encoding import force_str
+from django.shortcuts import resolve_url
+from django.contrib.auth.views import redirect_to_login
+from django.contrib.auth import REDIRECT_FIELD_NAME
+try:
+    from urllib.parse import urlparse
+except ImportError:     # Python 2
+    from urlparse import urlparse
+    
+from functools import wraps
+
 from .models import *
 
 from api.models import get_bounds
 
 
-class ImageList(ListView):
+def login_required(view):
+    @wraps(view)
+    def _wrapped_view(request, *args, **kwargs):
+        u = request.user
+        if u.is_authenticated() and u.is_staff:
+            return view(request, *args, **kwargs)
+        path = request.build_absolute_uri()
+        
+        resolved_login_url = force_str( resolve_url('/api/login/'))
+        login_scheme, login_netloc = urlparse(resolved_login_url)[:2]
+        current_scheme, current_netloc = urlparse(path)[:2]
+        if ((not login_scheme or login_scheme == current_scheme) and
+            (not login_netloc or login_netloc == current_netloc)):
+            path = request.get_full_path()
+        from django.contrib.auth.views import redirect_to_login
+        return redirect_to_login(
+            path, resolved_login_url, REDIRECT_FIELD_NAME)
+    return _wrapped_view
+
+class LoginRequiredMixin(object):
+    @classmethod
+    def as_view(cls):
+        return login_required(super(LoginRequiredMixin, cls).as_view())
+
+
+class ImageList(LoginRequiredMixin, ListView):
     model = GeoImage
     
     def get_queryset(self):
@@ -62,7 +98,8 @@ def debug_view(req, pk, zoom):
             
     return HttpResponse(json.dumps({'data':ret, 'base':base}), content_type="text/plain")
 
-class ImageCreate(CreateView):
+
+class ImageCreate(LoginRequiredMixin, CreateView):
     model = GeoImage
     fields = ['image','geom', 'pub_date', 'text']
     
@@ -72,7 +109,8 @@ class ImageCreate(CreateView):
         context['TODAY'] = date.today()
         return context
 
-class ImageUpdate(UpdateView):
+
+class ImageUpdate(LoginRequiredMixin, UpdateView):
     model = GeoImage
     fields = ['image','geom', 'pub_date', 'text']
     
@@ -81,7 +119,8 @@ class ImageUpdate(UpdateView):
         context['TILE_SERVER'] = settings.TILE_SERVER
         return context
 
-class ImageDelete(DeleteView):
+
+class ImageDelete(LoginRequiredMixin, DeleteView):
     model = GeoImage
     success_url = reverse_lazy('image')
 

@@ -1,7 +1,9 @@
 from django.conf.urls import patterns, url
 from .views import ImageList, ImageCreate, ImageUpdate, ImageDelete
+from django.contrib.auth.views import login
 
 urlpatterns = patterns('api.views',
+    url(r'login/$', login, {'template_name': 'api/login.html'}),
     url(r'image/debug/(?P<pk>\d+)/(?P<zoom>\d+)$', 'debug_view'),
     url(r'image/data/(?P<pk>\d+)$', 'image_data', name='image_data'),
     url(r'image$', ImageList.as_view(), name='image'),
