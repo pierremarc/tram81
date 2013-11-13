@@ -19,6 +19,7 @@ from api.models import GeoImage
 from shapely.geometry import MultiPolygon, Polygon, Point
 
 from api.views import login_required
+from tile.views import mapnik, Map, EPSG_3857_PROJ, LONGLAT_PROJ
 
 
 K_Lat = 'GPS GPSLatitude'
@@ -26,21 +27,40 @@ K_Lon = 'GPS GPSLongitude'
 K_LatRef = 'GPS GPSLatitudeRef'
 K_LonRef = 'GPS GPSLongitudeRef'
 
-PX_M = float(0.000001)
+PX_M = float(0.05)
+
+MAP = Map()
 
 
-def coords(P):
-    return (P.x, P.y)
+def from_map(pos):
+    cc = mapnik.Coord(pos.x, pos.y)
+    pcc = MAP.transform.backward(cc)
+    return Point(pcc.x, pcc.y)
 
-def make_rectangle(img, pos):
+def to_map(pos):
+    cc = mapnik.Coord(pos.x, pos.y)
+    pcc = MAP.transform.forward(cc)
+    return Point(pcc.x, pcc.y)
+
+def coords(orig_pos):
+    return (orig_pos.x, orig_pos.y)
+
+def make_rectangle(img, orig_pos):
     hu = float(img.width) / 2.0 * PX_M
     vu = float(img.height) / 2.0 * PX_M
-    tl = coords(Point(pos.x - hu, pos.y + vu))
-    tr = coords(Point(pos.x + hu, pos.y + vu))
-    bl = coords(Point(pos.x - hu, pos.y - vu))
-    br = coords(Point(pos.x + hu, pos.y - vu))
     
-    return Polygon((tl, tr, br, bl, tl))
+    pos = to_map(orig_pos)
+    
+    print 'SZ W {}({}) H {}({})'.format(img.width, hu, img.height, vu)
+    tl = coords(from_map(Point(pos.x - hu, pos.y + vu)))
+    tr = coords(from_map(Point(pos.x + hu, pos.y + vu)))
+    bl = coords(from_map(Point(pos.x - hu, pos.y - vu)))
+    br = coords(from_map(Point(pos.x + hu, pos.y - vu)))
+    
+    
+    p = Polygon((tl, tr, br, bl, tl))
+    print 'w = {}; h = {}'.format(p.bounds[2] - p.bounds[0], p.bounds[3] - p.bounds[1])
+    return p
 
 
 def DMStoDD(d, m , s, ref):
