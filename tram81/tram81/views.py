@@ -47,6 +47,7 @@ class IndexView(TemplateView):
             ids.append(str(ri.pk))
         context['REQ_IMAGES'] = ','.join(ids)
         context['FB_APP_ID'] = getattr(settings, 'SOCIAL_AUTH_FACEBOOK_KEY', '~')
+        context['FOOTER'] = getattr(settings, 'FOOTER', None)
         return context
     
 class JSConf(TemplateView):

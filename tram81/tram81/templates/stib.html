@@ -1,0 +1,41 @@
+
+<style>
+#footer{
+    height:250px;
+    background-image: url("{{STATIC_URL}}stib_bg.png");
+    background-position: bottom;
+    background-repeat: repeat-x;
+}
+
+#stib_logo{
+    position:absolute;
+    left:0;
+    bottom:0;
+}
+#stib_link{
+    position: absolute;
+    right: 32px;
+    bottom: 6px;
+    width: 128px;
+    font-weight: bold;
+    font-size: 15pt;
+    font-family: sans-serif;
+}
+
+#stib_link a{
+    color: #3C6DBE;
+    text-decoration: none;
+}
+
+#stib_link a:hover{
+    color:#305696;
+}
+</style>
+
+<div id="stib_logo">
+<img src="{{STATIC_URL}}stib_logo.png"></img>
+</div>
+
+<div id="stib_link">
+<a href="http://www.stib.be">www.stib.be</a>
+</div>
