@@ -14,4 +14,5 @@ urlpatterns = patterns('',
     url(r'^comments/', include('comments.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^social/', include('social.apps.django_app.urls', namespace='social')),
+    url(r'^bulk/$','tram81.bulk.view'),
 )

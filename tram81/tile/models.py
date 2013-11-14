@@ -52,17 +52,17 @@ class RiakCache(BaseCache):
         for keys in self.bucket.stream_keys():
             for key in keys:
                 bnd = self.index.get(key).data
-                print '============================='
-                print '%s %s'%(bounds,bnd)
+                #print '============================='
+                #print '%s %s'%(bounds,bnd)
                 if bnd and intersects(bounds, bnd):
-                    print 'About to remove tile %s'%(key,)
+                    #print 'About to remove tile %s'%(key,)
                     self.bucket.delete(key)
                     self.index.delete(key)
         
-        print 'END DELETE: %s'%(bounds)
+        #print 'END DELETE: %s'%(bounds)
         return
         
-        print 'START DELETE: %s'%(bounds)
+        #print 'START DELETE: %s'%(bounds)
         mr = self.riak.RiakMapReduce(self.client)
         mr.add_bucket(self.bucket.name)
         mr.map("""function(v, keyData, arg){
@@ -90,15 +90,16 @@ class RiakCache(BaseCache):
                 #print 'About to remove tile %s'%(key,)
                 #self.bucket.delete(key)
         for vals in mr.stream():
-            print vals
+            #print vals
             if vals[1]:
                 for val in vals[1]:
                     if val[0]:
-                        print 'Keep %s'%(val[1],)
+                        #print 'Keep %s'%(val[1],)
+                        pass
                     else:
-                        print 'About to remove tile %s'%(val[1],)
+                        #print 'About to remove tile %s'%(val[1],)
                         self.bucket.delete(key)
         
-        print 'END DELETE: %s'%(bounds)
+        #print 'END DELETE: %s'%(bounds)
         
         

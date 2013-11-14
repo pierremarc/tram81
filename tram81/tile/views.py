@@ -161,14 +161,9 @@ class Map(object):
         self.mapfile = settings.MAPNIK_MAPFILE
         self.map = mapnik.Map(settings.MAPNIK_TILE_SIZE, settings.MAPNIK_TILE_SIZE)
         mapnik.load_map(self.map, self.mapfile)
-        #self.map.maximum_extent = mapnik.Box2d(-180,-90,180,90)
-        #try:
-            #self.map.srs = settings.MAPNIK_MAP_SRS
-        #except AttributeError:
-            #self.map.srs = EPSG_3857_PROJ.params()
-           
-        self.map.zoom_to_box(self.map.maximum_extent)
         
+        self.map.zoom_to_box(self.map.maximum_extent)
+
         self.proj = mapnik.Projection(self.map.srs)
         self.transform = mapnik.ProjTransform(LONGLAT_PROJ, self.proj)
         self.inverse_transform = mapnik.ProjTransform(self.proj, LONGLAT_PROJ)
