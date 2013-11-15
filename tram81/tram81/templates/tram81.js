@@ -42,7 +42,8 @@ var default_bounds = undefined;
 
 {% endautoescape %}
 
-Zepto(function($){
+
+$(document).ready(function(){
     function csrfSafeMethod(method) {
         return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
     }
@@ -57,6 +58,24 @@ Zepto(function($){
         });
     
     $('#info_box').hide();
+    $('#page').hide();
+    $('.page .content').hide();
+    
+    function togglePage(page){
+        var content = page.find('div.content');
+        if(content.is(':visible')){
+            content.hide();
+        }
+        else{
+            $('.content').hide();
+            content.show();
+        }
+    }
+    
+    $('.page').on('click', function(evt){
+        togglePage($(this));
+    });
+    
     var panelIsVisible = false;
     var $map = $('#map');
     var map = L.map('map');
@@ -65,24 +84,27 @@ Zepto(function($){
         maxZoom: 28
     }).addTo(map);
     
-
+    
+    
     
     function showPanel(){
+        $('#pages').hide();
         var $info = $('#info_box');
         if(!panelIsVisible)
         {
             $info.css({opacity:'0'});
             $info.show();
-            $info.animate({opacity:'1'},400,'ease-in');
+            $info.animate({opacity:'1'},400);
         }
         panelIsVisible = true;
         return $info;
     };
     function hidePanel(){
+        $('#pages').show();
         var $info = $('#info_box');
         if(panelIsVisible)
         {
-            $info.animate({opacity:'0'},400,'ease-out', function(){
+            $info.animate({opacity:'0'},400, function(){
                 $info.hide();
             });
         }

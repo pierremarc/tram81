@@ -22,6 +22,7 @@ from django.views.generic import TemplateView
 from django.conf import settings
 from django.middleware.csrf import get_token
 
+from .models import Page
 from api.models import GeoImage
 
 
@@ -51,6 +52,7 @@ class IndexView(TemplateView):
         context['REQ_IMAGES'] = ','.join(ids)
         context['FB_APP_ID'] = getattr(settings, 'SOCIAL_AUTH_FACEBOOK_KEY', '~')
         context['FOOTER'] = getattr(settings, 'FOOTER', None)
+        context['PAGES'] = Page.objects.all()
         return context
     
 class JSConf(TemplateView):

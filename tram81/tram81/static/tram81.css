@@ -149,6 +149,38 @@ img.img{
     font-size:10pt;
 }
 
+#pages{
+    position: absolute;
+    z-index: 100;
+    right: 24px;
+    top: 24px;
+    max-width: 32%;
+    max-height: 70%;
+}
+
+#pages .page{
+    padding: 24px;
+    margin-bottom:32px;
+    color: #444;
+    background-color: white;
+    font-family: sans-serif;
+    
+    border: 1px solid #aaa;
+    
+/*    
+    -moz-box-shadow: 1px 1px 6px 2px #aaa;
+    -webkit-box-shadow: 1px 1px 6px 2px #aaa;
+    box-shadow: 1px 1px 6px 2px #aaa;*/
+
+}
+
+#pages .page .title{
+    font-size: 22pt;
+    font-weight:bold;
+}
+
+
+
 
 #footer{
     position:absolute;

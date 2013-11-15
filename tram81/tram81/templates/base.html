@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{STATIC_URL}}tram81.css" />
     
     <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
-    <script src="{{STATIC_URL}}zepto.js"></script>
+    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
 
     <script src="{% url 'js_conf' %}?ids={{REQ_IMAGES}}"></script>
@@ -45,6 +45,17 @@
 
 <div id="map"></div>
 <div id="info_box"></div>
+
+{% if PAGES %}
+<div id="pages">
+{% for page in PAGES %}
+<div class="page">
+<div class="title">{{ page.title }}</div>
+<div class="content">{{ page.formated_content|safe }}</div>
+</div>
+{% endfor %}
+</div>
+{% endif %}
 
 {% if FOOTER %}
 <div id="footer">
