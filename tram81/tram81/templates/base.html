@@ -8,9 +8,14 @@
     <![endif]-->
     <link rel="stylesheet" href="{{STATIC_URL}}tram81.css" />
     
+    
+<!--     <script src="{{STATIC_URL}}leaflet-src.js"></script> -->
     <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
-    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<!--     <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script> -->
+<!--     <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.3.0/lodash.underscore.min.js"></script> -->
     <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+    
 
     <script src="{% url 'js_conf' %}?ids={{REQ_IMAGES}}"></script>
 </head>
@@ -18,6 +23,15 @@
 <body>
 <div id="fb-root"></div>
 <script>
+
+function errorHandler (arg) {
+    for(var i in args){
+    console.log(arg[i]);
+    }        
+};
+
+window.onerror = errorHandler;
+
   window.fbAsyncInit = function() {
     // init the FB JS SDK
     FB.init({

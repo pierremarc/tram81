@@ -176,6 +176,8 @@ $(document).ready(function(){
     
     var global_images = [];
     function prepareLayers(data, idx){
+        if(!data || !data.geo) return;
+//         console.log(data.geo);
         var l = new L.geoJson(data.geo,{
             style: function (feature) {
                 return standard_style;
