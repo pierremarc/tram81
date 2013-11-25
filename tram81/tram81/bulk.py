@@ -51,7 +51,7 @@ def make_rectangle(img, orig_pos):
     
     pos = to_map(orig_pos)
     
-    print 'SZ W {}({}) H {}({})'.format(img.width, hu, img.height, vu)
+    #print 'SZ W {}({}) H {}({})'.format(img.width, hu, img.height, vu)
     tl = coords(from_map(Point(pos.x - hu, pos.y + vu)))
     tr = coords(from_map(Point(pos.x + hu, pos.y + vu)))
     bl = coords(from_map(Point(pos.x - hu, pos.y - vu)))
@@ -59,7 +59,7 @@ def make_rectangle(img, orig_pos):
     
     
     p = Polygon((tl, tr, br, bl, tl))
-    print 'w = {}; h = {}'.format(p.bounds[2] - p.bounds[0], p.bounds[3] - p.bounds[1])
+    #print 'w = {}; h = {}'.format(p.bounds[2] - p.bounds[0], p.bounds[3] - p.bounds[1])
     return p
 
 
@@ -120,7 +120,7 @@ def process_zip(zfn):
         except Exception, e:
             print str(e)
         
-        print u'{}: {}'.format(info.filename, ll)
+        #print u'{}: {}'.format(info.filename, ll)
         f.close()
         
     return ids
