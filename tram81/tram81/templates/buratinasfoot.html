@@ -1,48 +1,45 @@
 
 <style>
 #footer{
-    height:60px;
-    background-image: url("{{STATIC_URL}}stib_bg.png");
-    background-position: bottom;
-    background-repeat: repeat-x;
+    height:30px;
+    border-top: 1px solid #000;
 }
 
-#stib_logo{
+#footer_logo{
+    position:absolute;
+    left:4px;
+    bottom:4px;
+}
+
+#footer_logo img{
     position:absolute;
     left:0px;
     bottom:0px;
 }
 
-#stib_logo img{
-    position:absolute;
-    left:0px;
-    bottom:0px;
-}
-
-#stib_link{
+#footer_link{
     position: absolute;
     right: 32px;
     bottom: 6px;
     width: 128px;
-    font-weight: bold;
-    font-size: 15pt;
+    font-size: 12pt;
     font-family: sans-serif;
 }
 
-#stib_link a{
-    color: #3C6DBE;
+#footer_link a{
+    color: #000;
     text-decoration: none;
 }
 
-#stib_link a:hover{
-    color:#305696;
+#footer_link a:hover{
+    text-decoration: underline;
 }
 </style>
 
-<div id="stib_logo">
-<img src="{{STATIC_URL}}stib_logo.png"></img>
+<div id="footer_logo">
+<img src="{{STATIC_URL}}footer_logo.png"></img>
 </div>
 
-<div id="stib_link">
-<a href="http://www.stib.be">www.stib.be</a>
+<div id="footer_link">
+<a href="http://nadine.be">nadine.be</a>
 </div>
