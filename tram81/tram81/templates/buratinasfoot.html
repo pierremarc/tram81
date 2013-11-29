@@ -1,5 +1,19 @@
 
 <style>
+
+@font-face {
+    font-family: 'dejavu_sanscondensed';
+    src: url('dejavusanscondensed-webfont.eot');
+    src: url('dejavusanscondensed-webfont.eot?#iefix') format('embedded-opentype'),
+         url('dejavusanscondensed-webfont.woff') format('woff'),
+         url('dejavusanscondensed-webfont.ttf') format('truetype'),
+         url('dejavusanscondensed-webfont.svg#dejavu_sanscondensed') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
 #footer{
     height:30px;
     border-top: 1px solid #000;
@@ -15,6 +29,12 @@
     position:absolute;
     left:0px;
     bottom:0px;
+}
+
+#footer_text {
+    font-family: 'dejavu_sanscondensed';
+    font-size: 10pt;
+    color: #444;
 }
 
 #footer_link{
@@ -38,6 +58,10 @@
 
 <div id="footer_logo">
 <img src="{{STATIC_URL}}footer_logo.png"></img>
+</div>
+
+<div id="footer_text">
+<span>Buratinas is a project by <a href="http://nadine.be">nadine</a> and is supported by Brusselse Hoofdstedelijke Regering 'Water in de Stad' </span>
 </div>
 
 <div id="footer_link">
