@@ -26,7 +26,9 @@ from circus.arbiter import Arbiter
 from circus.util import (DEFAULT_ENDPOINT_DEALER, DEFAULT_ENDPOINT_SUB,
                                  DEFAULT_ENDPOINT_MULTICAST,
                                  DEFAULT_ENDPOINT_STATS)
-from circus.sockets import CircusSocket
+from circus.sockets import CircusSocket, CircusSockets
+from circus import logger
+from circus.util import configure_logger
 from importlib import  import_module
 
 
@@ -44,8 +46,11 @@ SERVER_NAME = 'name'
 SERVER_PROGRAM = 'program'
 SERVER_ARGS = 'args'
 SERVER_ENV = 'env'
+SERVER_HOST = 'host'
 SERVER_PORT = 'port'
 SERVER_WORKING_DIR = 'working_dir'
+SERVER_WORKERS = 'workers'
+
 
 def gc(s, a, d=None):
     try:
@@ -54,7 +59,7 @@ def gc(s, a, d=None):
         return d
 
 def main():
-    
+    #configure_logger(logger, 'DEBUG')
     config_mod = 'circus_settings'
     if len(sys.argv) > 1:
         config_mod = sys.argv[1]
@@ -74,24 +79,32 @@ def main():
         
         w = Watcher(gc(s, SERVER_NAME), 
                     gc(s, SERVER_PROGRAM), 
-                    gc(s, SERVER_ARGS), 
+                    gc(s, SERVER_ARGS),
+                    numprocesses=gc(s, SERVER_WORKERS, 1), 
                     working_dir=gc(s, SERVER_WORKING_DIR, './'),
                     env=gc(s, SERVER_ENV, dict()),
                     copy_env=True, 
-                    copy_path=True)
+                    copy_path=True,
+                    use_sockets=True)
         
         watchers.append(w)
         
         sock_port = gc(s, SERVER_PORT)
         if sock_port is not None:
-            sock_name = 'circus.socket.{0}'.format(%gc(s, SERVER_NAME))
-            sock = CircusSocket(sock_name, port=sock_port)
+            sock_name = gc(s, SERVER_NAME)
+            sock_host = gc(s, SERVER_HOST, '127.0.0.1')
+            sock = CircusSocket(sock_name, host=sock_host, port=sock_port)
             sockets.append(sock)
         
-        
+    for sock in sockets:
+        print '>> %s'%(sock,)
 
-        
-    if HAS_WEB:
+    try:
+        WANT_WEB = getattr(config, 'WANT_WEB')
+    except Exception:
+        WANT_WEB = True
+
+    if HAS_WEB and WANT_WEB:
         arbiter = Arbiter(watchers, DEFAULT_ENDPOINT_DEALER, DEFAULT_ENDPOINT_SUB, 
                           sockets=sockets,
                         stats_endpoint=DEFAULT_ENDPOINT_STATS, 
