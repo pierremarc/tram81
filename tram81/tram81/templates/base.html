@@ -21,17 +21,9 @@
 </head>
 
 <body>
+{% if HAS_COMMENTS %}
 <div id="fb-root"></div>
 <script>
-
-function errorHandler (arg) {
-    for(var i in args){
-    console.log(arg[i]);
-    }        
-};
-
-window.onerror = errorHandler;
-
   window.fbAsyncInit = function() {
     // init the FB JS SDK
     FB.init({
@@ -57,7 +49,8 @@ window.onerror = errorHandler;
    }(document, 'script', 'facebook-jssdk'));
 
 </script>
-<!-- <a href="{% url 'social:begin' "facebook" %}">Facebook</a> -->
+{% endif %}
+
 
 <div id="map"></div>
 <div id="info_box"></div>

@@ -49,6 +49,7 @@ class IndexView(TemplateView):
         ids = []
         for ri in req_images:
             ids.append(str(ri.pk))
+        context['HAS_COMMENTS'] = getattr(settings, 'HAS_COMMENTS', False)
         context['REQ_IMAGES'] = ','.join(ids)
         context['FB_APP_ID'] = getattr(settings, 'SOCIAL_AUTH_FACEBOOK_KEY', '~')
         context['FOOTER'] = getattr(settings, 'FOOTER', None)
@@ -67,9 +68,10 @@ class JSConf(TemplateView):
         context['TILE_SERVER'] = settings.TILE_SERVER
         context['images'] = GeoImage.objects.all().order_by('pub_date')
         ids = self.request.GET['ids'].split(',')
-        print 'IDS: %s'%(ids,)
+        #print 'IDS: %s'%(ids,)
         context['REQ_IMAGES'] = GeoImage.objects.filter(pk__in=ids)
         context['csrf'] = get_token(self.request)
+        context['HAS_COMMENTS'] = getattr(settings, 'HAS_COMMENTS', False)
         
         return context
         
