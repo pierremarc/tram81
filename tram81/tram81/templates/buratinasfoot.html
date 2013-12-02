@@ -28,6 +28,10 @@
     width: 260px;
 }
 
+#footer_logo a{
+     border: 0px;
+}
+
 #footer_logo img{
     position:absolute;
     left:0px;
@@ -47,20 +51,19 @@
 #footer_text a{
     color: #000;
     text-decoration: none;
-    font-style: italic;
+    color: #111;
 }
 
 #footer_text a:hover{
     text-decoration: underline;
-    font-style: italic;
 }
 
 </style>
 
 <div id="footer_logo">
-<img src="{{STATIC_URL}}footer_logo.png"></img>
+<a href="448"><img src="{{STATIC_URL}}footer_logo.png"></img></a>
 </div>
 
 <div id="footer_text">
-<span>Buratinas is a project by <a href="http://nadine.be">nadine</a> and is supported by Brusselse Hoofdstedelijke Regering 'Water in de Stad' </span>
+<span>Buratinas is a project by <a href="http://nadine.be">nadine</a> since <a href="450">2011</a> and is supported by Brusselse Hoofdstedelijke Regering 'Water in de Stad' </span>
 </div>
