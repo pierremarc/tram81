@@ -71,7 +71,7 @@ $(document).ready(function(){
             content.show();
         }
     }
-    
+  
     $('.page').on('click', function(evt){
         togglePage($(this));
     });
@@ -193,6 +193,7 @@ $(document).ready(function(){
             l.setStyle(highlight_style);
         });
         l.on('click', function(evt){
+            {% if HAS_COMMENTS %}
             var $info = $('#info_box');
             var ui = {
                 img_box: $('<div />').addClass('img_box'),
@@ -229,6 +230,26 @@ $(document).ready(function(){
             
             
             showPanel();
+            
+            {% else %}
+            
+            map.fitBounds(this.getBounds());
+            if(window.history && window.history.pushState)
+            {
+                var bnds = this.getBounds();
+                var bounds = {
+                    sw:[bnds.getSouth(), bnds.getWest()],
+                    ne:[bnds.getNorth(), bnds.getEast()],
+                }
+//                 console.log('pushState', this.data.pk, bounds);
+                window.history.pushState(
+                    bounds,
+                    this.data.img_url,
+                    this.data.pk
+                );
+            }
+            
+            {% endif %}
         });
     };
     _.each(window.T81.data, prepareLayers);
@@ -244,6 +265,29 @@ $(document).ready(function(){
         }
     });
     map.setView([50.854075572144815, 4.38629150390625], 13);
+    
+    if(window.history && window.history.pushState)
+    {
+        window.onpopstate = function(evt){
+//             console.log('popState', evt.state);
+            var state = evt.state;
+            if(state && state.sw && state.ne){
+                var bounds = L.latLngBounds(state.sw, state.ne);
+                console.log('got bounds!', bounds);
+                map.fitBounds(bounds);
+            }
+            else{
+                if(default_bounds)
+                {
+                    map.fitBounds(default_bounds);
+                }
+                else
+                {
+                    map.fitBounds(las_image);
+                }
+            }
+        };
+    }
 
     {% if user %}
     var user = '{{ user.username }}';
