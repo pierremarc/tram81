@@ -3,11 +3,11 @@
 
 @font-face {
     font-family: 'dejavu_sanscondensed';
-    src: url('fonts/dejavusanscondensed-webfont.eot');
-    src: url('fonts/dejavusanscondensed-webfont.eot?#iefix') format('embedded-opentype'),
-         url('fonts/dejavusanscondensed-webfont.woff') format('woff'),
-         url('fonts/dejavusanscondensed-webfont.ttf') format('truetype'),
-         url('fonts/dejavusanscondensed-webfont.svg#dejavu_sanscondensed') format('svg');
+    src: url('{{STATIC_URL}}fonts/dejavusanscondensed-webfont.eot');
+    src: url('{{STATIC_URL}}fonts/dejavusanscondensed-webfont.eot?#iefix') format('embedded-opentype'),
+         url('{{STATIC_URL}}fonts/dejavusanscondensed-webfont.woff') format('woff'),
+         url('{{STATIC_URL}}fonts/dejavusanscondensed-webfont.ttf') format('truetype'),
+         url('{{STATIC_URL}}fonts/dejavusanscondensed-webfont.svg#dejavu_sanscondensed') format('svg');
     font-weight: normal;
     font-style: normal;
 
@@ -17,12 +17,15 @@
 #footer{
     height:30px;
     border-top: 1px solid #000;
+    background: #fff;
 }
 
 #footer_logo{
     position:absolute;
     left:4px;
     bottom:4px;
+    display: block;
+    width: 260px;
 }
 
 #footer_logo img{
@@ -33,27 +36,26 @@
 
 #footer_text {
     font-family: 'dejavu_sanscondensed';
-    font-size: 10pt;
+    font-size: 8pt;
     color: #444;
+    display: block;
+    margin-left: 265px;
+    margin-top: 4px;
+    height : 30px;
+    line-height: 9.5pt;
 }
 
-#footer_link{
-    position: absolute;
-    right: 32px;
-    bottom: 6px;
-    width: 128px;
-    font-size: 12pt;
-    font-family: sans-serif;
-}
-
-#footer_link a{
+#footer_text a{
     color: #000;
     text-decoration: none;
+    font-style: italic;
 }
 
-#footer_link a:hover{
+#footer_text a:hover{
     text-decoration: underline;
+    font-style: italic;
 }
+
 </style>
 
 <div id="footer_logo">
@@ -62,8 +64,4 @@
 
 <div id="footer_text">
 <span>Buratinas is a project by <a href="http://nadine.be">nadine</a> and is supported by Brusselse Hoofdstedelijke Regering 'Water in de Stad' </span>
-</div>
-
-<div id="footer_link">
-<a href="http://nadine.be">nadine.be</a>
 </div>
