@@ -59,8 +59,23 @@
 <div id="pages">
 {% for page in PAGES %}
 <div class="page">
-<div class="title">{{ page.title }}</div>
-<div class="content">{{ page.formated_content|safe }}</div>
+
+    {% if page.title_image %}
+    <div class="title">
+        <img src="{{page.title_image.url}}"></img>
+    </div>
+    {% else %}
+    <div class="title">{{ page.title }}</div>
+    {% endif %}
+
+    {% if page.content_image %}
+    <div class="content">
+        <img src="{{page.content_image.url}}"></img>
+    </div>
+    {% else %}
+    <div class="content">{{ page.formated_content|safe }}</div>
+    {% endif %}
+    
 </div>
 {% endfor %}
 </div>

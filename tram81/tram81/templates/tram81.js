@@ -59,22 +59,31 @@ $(document).ready(function(){
     
     $('#info_box').hide();
     $('#page').hide();
-    $('.page .content').hide();
     
-    function togglePage(page){
-        var content = page.find('div.content');
-        if(content.is(':visible')){
-            content.hide();
-        }
-        else{
-            $('.content').hide();
-            content.show();
-        }
-    }
-  
-    $('.page').on('click', function(evt){
-        togglePage($(this));
-    });
+    (function prepapePages(undefined){
+        var $pages = $('.page');
+        $pages.each(function(idx, el){
+            var $el = $(el);
+            var content = $el.find('div.content');
+            content.detach();
+            
+            $el.on('click', function(evt){
+                if(content.hasClass('is_visible')){
+                    content.removeClass('is_visible');
+                    content.detach();
+                }
+                else{
+                    content.addClass('is_visible');
+                    content.appendTo('body');
+                }
+            });
+            
+            content.on('click', function(evt){
+                content.removeClass('is_visible');
+                content.detach();
+            });
+        });
+    })();
     
     var panelIsVisible = false;
     var $map = $('#map');

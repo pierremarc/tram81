@@ -26,6 +26,31 @@ class Page(models.Model):
     title = models.CharField(max_length=256)
     content = models.TextField(default=u'', blank=True)
     
+    title_height = models.IntegerField(default=0, editable=False)
+    title_width = models.IntegerField(default=0, editable=False)
+    title_image = models.ImageField(upload_to='image_title', 
+                              height_field='title_height', 
+                              width_field='title_width', 
+                              max_length=124)
+    
+    
+    title_height = models.IntegerField(default=0, editable=False)
+    title_width = models.IntegerField(default=0, editable=False)
+    title_image = models.ImageField(upload_to='image_title', 
+                              height_field='title_height', 
+                              width_field='title_width', 
+                              max_length=124, 
+                              blank=True)
+    
+    
+    content_height = models.IntegerField(default=0, editable=False)
+    content_width = models.IntegerField(default=0, editable=False)
+    content_image = models.ImageField(upload_to='image_content', 
+                              height_field='content_height', 
+                              width_field='content_width', 
+                              max_length=124, 
+                              blank=True)
+    
     def formated_content(self):
         md = Markdown()
         try:
