@@ -53,6 +53,7 @@ class IndexView(TemplateView):
         context['REQ_IMAGES'] = ','.join(ids)
         context['FB_APP_ID'] = getattr(settings, 'SOCIAL_AUTH_FACEBOOK_KEY', '~')
         context['FOOTER'] = getattr(settings, 'FOOTER', None)
+        context['SITE_TITLE'] = getattr(settings, 'SITE_TITLE', '~')
         context['PAGES'] = Page.objects.all()
         return context
     
