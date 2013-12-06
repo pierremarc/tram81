@@ -35,7 +35,7 @@ class ThreadView(TemplateView):
         
         return context
 
-
+@csrf_exempt
 def create_comment(request):
     try:
         txt = request.POST['txt']
