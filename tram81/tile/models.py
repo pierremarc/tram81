@@ -1,10 +1,14 @@
+
+import os
+import json
+
 from django.conf import settings
-import  json
 
 class BaseCache(object):
     """
     
     """
+    
     def PUT(self, key, bounds, data):
         raise NotImplementedError()
     
@@ -16,6 +20,111 @@ class BaseCache(object):
     
     def DELETE(self, bounds):
         raise NotImplementedError()
+    
+    def intersects(A, B):
+        return (    A['minx'] <= B['maxx']
+                and B['minx'] <= A['maxx']
+                and A['miny'] <= B['maxy']
+                and B['miny'] <= A['maxy'])
+    
+    
+    
+class MongoCache(BaseCache):
+    """
+    
+    """
+    
+    def __init__(self, *args, **kwargs):
+        import pymongo
+        self.mongo = pymongo
+        ms = settings.MONGO_TILE_SETTINGS
+        self.client = self.mongo.MongoClient(ms['host'], ms['port'])
+        self.database = self.client[ms['database']]
+        self.index = self.database.tile_index
+        self.index.ensure_index([('bounds', self.mongo.GEOSPHERE),])
+        self.root_dir = os.path.abspath(ms['root_dir'])
+        
+    def make_mongo_key(self, key, sep='_'):
+        return sep.join(key.split('.'))
+    
+    def make_path_from_key(self, key):
+        path = os.path.join(self.root_dir,
+                            os.path.sep.join(key.split('.')))
+        pdir = os.path.dirname(path)
+        if not os.path.exists(pdir):
+            try:
+                os.makedirs(pdir)
+            except Exception:
+                pass # likely it has been made in another thread
+            
+        return path
+        
+    def get_center(self, bounds):
+        coords = [ 
+            bounds['minx'] + ((bounds['maxx'] - bounds['minx']) / 2.0),
+            bounds['miny'] + ((bounds['maxy'] - bounds['miny']) / 2.0),
+            ]
+        return dict(type="Point", coordinates=coords)
+    
+    def get_polygon(self, bounds):
+        coords = [[
+            [bounds['minx'],bounds['miny']],
+            [bounds['minx'],bounds['maxy']],
+            [bounds['maxx'],bounds['maxy']],
+            [bounds['maxx'],bounds['miny']],
+            [bounds['minx'],bounds['miny']],
+            ]]
+        return dict(type="Polygon", coordinates=coords)
+    
+    def PUT(self, key, bounds, data):
+        fn = self.make_path_from_key(key)
+        with open(fn, 'wb') as sink:
+            try:
+                sink.write(data)
+                idx_entry = dict(_id=self.make_mongo_key(key), 
+                                 bounds=self.get_polygon(bounds), 
+                                 path=fn)
+                self.index.insert(idx_entry)
+            except Exception, e:
+                print '[MongoCache.PUT] Failed to store %s'%key
+                print str(e)
+                
+            
+    
+    def HAS(self, key):
+        if self.index.find_one(dict(_id=self.make_mongo_key(key))) is not None:
+            return True
+        return False
+    
+    def GET(self, key):
+        print 'MongoCache.GET %s'%key
+        entry = self.index.find_one(dict(_id=self.make_mongo_key(key)))
+        f = open(entry['path'], 'r')
+        data = f.read()
+        f.close()
+        return data
+    
+    def DELETE(self, bounds):
+        
+        polygon = self.get_polygon(bounds)
+        request = { 'bounds' : { '$geoIntersects' : { '$geometry' : polygon } } }
+        
+        print 'MongoCache.DELETE: %s'%request
+        
+        for item in self.index.find(request):
+            path = item['path']
+            id = item['_id']
+            print 'MongoCache.DELETE: item %s %s'%(id, path)
+            if id is not None:
+                try:
+                    self.index.remove(id)
+                    os.unlink(path)
+                except Exception, e:
+                    print '[MongoCache.DELETE] Failed to delete %s, %s'%(id, path)
+                    print str(e)
+                
+            
+        return
     
     
 class RiakCache(BaseCache):
@@ -46,15 +155,12 @@ class RiakCache(BaseCache):
     
     def DELETE(self, bounds):
         
-        def intersects(A, B):
-            return A['minx'] <= B['maxx'] and B['minx'] <= A['maxx'] and A['miny'] <= B['maxy'] and B['miny'] <= A['maxy']
-        
         for keys in self.bucket.stream_keys():
             for key in keys:
                 bnd = self.index.get(key).data
                 #print '============================='
                 #print '%s %s'%(bounds,bnd)
-                if bnd and intersects(bounds, bnd):
+                if bnd and self.intersects(bounds, bnd):
                     #print 'About to remove tile %s'%(key,)
                     self.bucket.delete(key)
                     self.index.delete(key)

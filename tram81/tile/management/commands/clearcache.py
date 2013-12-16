@@ -1,20 +1,25 @@
 
+import os
+
 from django.db import connection
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
-import riak
+from tile.models import MongoCache
 
 class Command(BaseCommand):
     help = 'Clear tile server cache'
 
     def handle(self, *args, **options):
-        RC = settings.RIAK_TILE_CONNECTION
-        self.client = riak.RiakClient(**RC)
-        self.bucket = self.client.bucket(settings.RIAK_TILE_BUCKET)
-        self.index = self.client.bucket(settings.RIAK_TILE_BUCKET + '_index')
+        cache = MongoCache()
         
-        for R in self.index.stream_keys():
-            for r in R:
-                self.bucket.delete(r)
-                self.index.delete(r)
+        for item in cache.index.find():
+            path = item['path']
+            id = item['_id']
+            if id is not None:
+                try:
+                    cache.index.remove(id)
+                    os.unlink(path)
+                except Exception, e:
+                    self.stdout.write('[clearcache] Failed to delete %s, %s'%(id, path))
+                    print str(e)
