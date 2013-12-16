@@ -2,7 +2,7 @@ from django.contrib.gis.db import models
 from django.core.urlresolvers import reverse
 from django.db.models.signals import pre_save, post_save
 
-from tile.models import RiakCache
+from tile.models import MongoCache
 
 from datetime import date
 
@@ -53,14 +53,14 @@ def get_bounds(poly):
     return dict(minx=minx,miny=miny, maxx=maxx, maxy=maxy)
         
 def invalidate_current(sender, **kwargs):
-    c = RiakCache()
+    c = MongoCache()
     instance = kwargs['instance']
     if instance.id:
         obj = GeoImage.objects.get(pk=instance.id)
         c.DELETE(get_bounds(obj.geom))
         
 def invalidate_new(sender, **kwargs):
-    c = RiakCache()
+    c = MongoCache()
     instance = kwargs['instance']
     c.DELETE(get_bounds(instance.geom))
     

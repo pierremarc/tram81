@@ -102,19 +102,28 @@ class WSGIServer(wsgiserver.CherryPyWSGIServer):
                     raise self.interrupt
 
 def main():
-    sock_fd = int(sys.argv[1])
+    
     application = DebugDjangoError(django_application)
-    server = WSGIServer('fd://%d'%(sock_fd,), application)
     
     try:
-        print 'Start Server on fd://%d'%(sock_fd,)
+        if len(sys.argv) == 2:
+            sock_fd = int(sys.argv[1])
+            server = WSGIServer('fd://%d'%(sock_fd,), application)
+            print 'Start Server on fd://%d'%(sock_fd,)
+            server.start_with_socket_fd(sock_fd)
+            
+        else:
+            sys.path.append(sys.argv[3])
+            server = WSGIServer((sys.argv[1],int(sys.argv[2])), application)
+            print 'Start Server on %s:%s'%(sys.argv[1],sys.argv[2])
+            server.start()
+        
+        
         print 'CTRL+C to interrupt'
-        server.start_with_socket_fd(sock_fd)
     except KeyboardInterrupt:
         print 'Stopping server'
         server.stop()
         print 'Bye!'
-        
     
 
 

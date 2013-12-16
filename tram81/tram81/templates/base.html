@@ -1,20 +1,18 @@
 <!DOCTYPE html> 
 <html>
 <head>
-    <title>Buratinas / Solar boat</title>
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
+    <title>{{SITE_TITLE}}</title>
+    <link rel="stylesheet" href="{{STATIC_URL}}leaflet.css" />
     <!--[if lte IE 8]>
-        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
+        <link rel="stylesheet" href="{{STATIC_URL}}leaflet.ie.css" />
     <![endif]-->
     <link rel="stylesheet" href="{{STATIC_URL}}tram81.css" />
     
     
-<!--     <script src="{{STATIC_URL}}leaflet-src.js"></script> -->
-    <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
-    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-<!--     <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script> -->
-<!--     <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.3.0/lodash.underscore.min.js"></script> -->
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+    
+    <script src="{{STATIC_URL}}leaflet.js"></script>
+    <script src="{{STATIC_URL}}jquery-min.js"></script>
+    <script src="{{STATIC_URL}}underscore-min.js"></script>
     
 
     <script src="{% url 'js_conf' %}?ids={{REQ_IMAGES}}"></script>
@@ -59,8 +57,23 @@
 <div id="pages">
 {% for page in PAGES %}
 <div class="page">
-<div class="title">{{ page.title }}</div>
-<div class="content">{{ page.formated_content|safe }}</div>
+
+    {% if page.title_image %}
+    <div class="title">
+        <img src="{{page.title_image.url}}"></img>
+    </div>
+    {% else %}
+    <div class="title">{{ page.title }}</div>
+    {% endif %}
+
+    {% if page.content_image %}
+    <div class="content">
+        <img src="{{page.content_image.url}}"></img>
+    </div>
+    {% else %}
+    <div class="content">{{ page.formated_content|safe }}</div>
+    {% endif %}
+    
 </div>
 {% endfor %}
 </div>

@@ -83,20 +83,25 @@ def dbg_intersects(A, B, bid):
         
 
 def debug_view(req, pk, zoom):
-    from tile.models import RiakCache
-    c = RiakCache()
+    from tile.models import MongoCache
+    c = MongoCache()
     g = GeoImage.objects.get(pk=int(pk))
     base = get_bounds(g.geom)
+    polygon = c.get_polygon(base)
+    request = { 'center' : { '$geoIntersects' : { '$geometry' : polygon } } }
+        
     ret = []
-    for keys in c.bucket.stream_keys():
-        for k in keys:
-            z, x, y = list(k.split('.'))
-            if z == zoom:
-                bounds = c.index.get(k).data
-                dbg_intersects(base, bounds, k)
-                ret.append(dict(key=k,x=x,y=y,z=z,bounds=bounds,damaged=intersects(base, bounds)))
-            
-    return HttpResponse(json.dumps({'data':ret, 'base':base}), content_type="text/plain")
+    for item in c.index.find(request):
+        k = item['_id']
+        z, x, y = list(k.split('_'))
+        #if z == zoom:
+        bounds = item['bounds']
+        ret.append(c.get_polygon(bounds))
+    centers = []
+    for item in c.index.find():
+        centers.append(item['center'])
+        
+    return HttpResponse(json.dumps({'data':ret, 'base':base, 'centers':centers}), content_type="text/plain")
 
 
 class ImageCreate(LoginRequiredMixin, CreateView):

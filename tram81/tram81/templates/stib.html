@@ -2,9 +2,6 @@
 <style>
 #footer{
     height:60px;
-    background-image: url("{{STATIC_URL}}stib_bg.png");
-    background-position: bottom;
-    background-repeat: repeat-x;
 }
 
 #stib_logo{
@@ -19,30 +16,53 @@
     bottom:0px;
 }
 
+#stib_link_box{
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    left: 285px;
+    height:32px;
+    
+    background-image: url("{{STATIC_URL}}stib_bg.png");
+    background-position: bottom;
+    background-repeat: repeat-x;
+}
+
 #stib_link{
     position: absolute;
     right: 32px;
-    bottom: 6px;
-    width: 128px;
-    font-weight: bold;
-    font-size: 15pt;
+    bottom: 1px;
+    width: 252px;
+/*     font-weight: bold; */
+    font-size: 12px;
     font-family: sans-serif;
+    text-align:right;
 }
 
 #stib_link a{
     color: #3C6DBE;
     text-decoration: none;
+    
 }
 
 #stib_link a:hover{
     color:#305696;
 }
+
+.ital{
+    font-style:italic;
+}
+
 </style>
 
 <div id="stib_logo">
 <img src="{{STATIC_URL}}stib_logo.png"></img>
 </div>
 
-<div id="stib_link">
-<a href="http://www.stib.be">www.stib.be</a>
+<div id="stib_link_box">
+    <div id="stib_link">
+    <a href="http://www.stib.be">www.stib.be</a>
+    —
+    <a class="ital" href="http://www.mivb.be">www.mivb.be</a>
+    </div>
 </div>

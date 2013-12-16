@@ -5,6 +5,8 @@ Bulk upload on buratinas
 """
 
 
+from threading import Thread
+import datetime
 
 from fractions import Fraction
 from exifread import process_file as read_exif
@@ -26,6 +28,8 @@ K_Lat = 'GPS GPSLatitude'
 K_Lon = 'GPS GPSLongitude'
 K_LatRef = 'GPS GPSLatitudeRef'
 K_LonRef = 'GPS GPSLongitudeRef'
+
+K_DateTime = 'EXIF DateTimeOriginal'
 
 PX_M = float(0.05)
 
@@ -90,40 +94,60 @@ def extract_ll(tags):
     #print '{} {} => {} {}'.format(xlon, xlat, lon, lat)
     return Point(lon, lat)
 
+def extract_date(tags):
+    ds = tags[K_DateTime].values
+    dparts = ds.split(' ')[0].split(':')
+    return datetime.date(int(dparts[0]),
+                         int(dparts[1]),
+                         int(dparts[2]))
+
 def main():
     import sys
     zfn = sys.argv[1]
-    process_zip(zfn)
+    #process_zip(zfn)
     
-def process_zip(zfn):
     
-    z = ZipFile(zfn)
-    infos = z.infolist()
-    
-    ids = []
-    
-    for info in infos:
-        f = StringIO()
-        f.write(z.read(info))
-        f.seek(0)
-        ll = extract_ll(read_exif(f))
-        f.seek(0)
-        img = ImageFile(f)
-        item = GeoImage()
-        bbox = make_rectangle(img, ll)
-        item.geom = bbox.wkt
-        item.width = img.width
-        item.height = img.height
-        try:
-            item.image.save(info.filename, img)
-            ids.append(item.id)
-        except Exception, e:
-            print str(e)
+class Processor(Thread):
+    def __init__(self, zfn):
+        self.zip_filename = zfn
+        super(Processor, self).__init__()
         
-        #print u'{}: {}'.format(info.filename, ll)
-        f.close()
+    def run(self):
+        print('Processing %s'%self.zip_filename)
+        z = ZipFile(self.zip_filename)
+        infos = z.infolist()
         
-    return ids
+        ids = []
+        
+        for info in infos:
+            try:
+                f = StringIO()
+                f.write(z.read(info))
+                f.seek(0)
+                tags = read_exif(f)
+                ll = extract_ll(tags)
+                f.seek(0)
+                img = ImageFile(f)
+                item = GeoImage()
+                bbox = make_rectangle(img, ll)
+                item.geom = bbox.wkt
+                item.width = img.width
+                item.height = img.height
+                try:
+                    item.pub_date = extract_date(tags)
+                except Exception, e:
+                    print 'could not extract date: %s'%e
+                try:
+                    item.image.save(info.filename, img)
+                    ids.append(item.id)
+                    print('Inserted %s with ID %d'%(info.filename, item.id))
+                except Exception, e:
+                    print str(e)
+                
+                #print u'{}: {}'.format(info.filename, ll)
+                f.close()
+            except Exception:
+                pass
         
 @login_required
 def view(request):
@@ -131,8 +155,9 @@ def view(request):
         fs = request.FILES
         
         f = fs['zip']
-        process_zip(f)
-        return redirect('/')
+        p = Processor(f)
+        p.start()
+        return redirect('/api/geoimage')
     else:
         ctx = RequestContext(request)
         #print ctx

@@ -7,7 +7,7 @@ from django.conf import settings
 from django.http import HttpResponse, Http404
 from django.contrib.gis.geos import Polygon, MultiPolygon
 
-from .models import RiakCache
+from .models import RiakCache, MongoCache
 
 
 import mapnik
@@ -151,7 +151,7 @@ class ImageMixer(object):
 class Map(object):
     
     root = os.path.join(settings.MEDIA_ROOT, 'tiles')
-    cache = RiakCache()
+    cache = MongoCache()
     
     def __init__(self):
         print 'CREATE MAP: %s'%(settings.MAPNIK_MAPFILE,)
@@ -173,9 +173,7 @@ class Map(object):
         #mb = self.map.envelope()
         #print 'Map extent: %s; latlon => %s'%(mb, self.inverse_transform.forward(mb))
         
-        #if not os.path.exists(self.root):
-            #os.makedirs(self.root)
-            
+        
         if settings.MAPNIK_DEBUG:
             gs = GeoImage.objects.all()
             csv_data = ['wkt, path']
@@ -195,22 +193,6 @@ class Map(object):
             layer.styles.append('DebugStyle')
             self.map.layers.append(layer)
             
-        
-        
-    #def get_tile_path(self, z, x, y, image_type='png'):
-        #sx = str(x)
-        #sy = str(y)
-        #sz = str(z)
-        #tile_dir =  os.path.join(self.root, sz, sx)
-        #tile_name = '.'.join([sz,sx,sy, image_type])
-        #tile_path = os.path.join(self.root, tile_name)
-        ##if not os.path.exists(tile_dir):
-            ##os.makedirs(tile_dir)
-        #if not os.path.exists(tile_path):
-            #im = self.get_tile(z,x,y)
-            #im.save(tile_path, image_type)
-            
-        #return tile_path
     
     def get_tile(self, z, x, y):
         sx = str(x)
