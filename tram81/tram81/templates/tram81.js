@@ -263,16 +263,24 @@ $(document).ready(function(){
     };
     _.each(window.T81.data, prepareLayers);
     var las_image = global_images[global_images.length -1].getBounds();
-    map.once('load', function(){
-        if(default_bounds)
-        {
-            map.fitBounds(default_bounds);
-        }
-        else
-        {
-            map.fitBounds(las_image);
-        }
-    });
+    if(default_bounds)
+    {
+        map.fitBounds(default_bounds);
+    }
+    else
+    {
+        map.fitBounds(las_image);
+    }
+//     map.once('load', function(){
+//         if(default_bounds)
+//         {
+//             map.fitBounds(default_bounds);
+//         }
+//         else
+//         {
+//             map.fitBounds(las_image);
+//         }
+//     });
     map.setView([50.854075572144815, 4.38629150390625], 13);
     
     if(window.history && window.history.pushState)
