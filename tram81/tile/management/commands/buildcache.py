@@ -9,7 +9,7 @@ from optparse import make_option
 
 from api.models import GeoImage, get_bounds
 from tile.models import MongoCache
-from tile.views import Map
+from tile.views import map_pool
 from tile.tilenames import tileXY
 
 
@@ -30,7 +30,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        map0 = Map()
+        global map_pool
         images = GeoImage.objects.all()
         
         min_zoom = options['min_zoom']
@@ -50,6 +50,6 @@ class Command(BaseCommand):
                 # we buffer the cache a bit
                 for x in range(minx -1, maxx +1):
                     for y in range(miny -1, maxy +1):
-                        map0.get_tile(z,x,y)
+                        map_pool.get_map().get_tile(z,x,y)
         
         
