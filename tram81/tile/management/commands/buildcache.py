@@ -41,12 +41,12 @@ class Command(BaseCommand):
                                 % (image.pk, min_zoom, max_zoom - 1))
             bounds = get_bounds(image.geom)
             for z in range(min_zoom, max_zoom):
-                minx,miny = tileXY(bounds['miny'], 
+                minx, maxy = tileXY(bounds['miny'], 
                                    bounds['minx'], z)
-                maxx,maxy = tileXY(bounds['maxy'], 
+                
+                maxx, miny = tileXY(bounds['maxy'], 
                                    bounds['maxx'], z)
-                self.stdout.write('%d> %d,%d :: %d,%d'
-                                    %(z, minx,miny,maxx,maxy ))
+                
                 # we buffer the cache a bit
                 for x in range(minx -1, maxx +1):
                     for y in range(miny -1, maxy +1):

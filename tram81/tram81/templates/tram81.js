@@ -263,24 +263,10 @@ $(document).ready(function(){
     };
     _.each(window.T81.data, prepareLayers);
     var las_image = global_images[global_images.length -1].getBounds();
-    if(default_bounds)
-    {
-        map.fitBounds(default_bounds);
-    }
-    else
-    {
-        map.fitBounds(las_image);
-    }
-//     map.once('load', function(){
-//         if(default_bounds)
-//         {
-//             map.fitBounds(default_bounds);
-//         }
-//         else
-//         {
-//             map.fitBounds(las_image);
-//         }
-//     });
+    var init_bounds = default_bounds || las_image;
+    map.whenReady(function(){
+            map.fitBounds(init_bounds);
+    });
     map.setView([50.854075572144815, 4.38629150390625], 13);
     
     if(window.history && window.history.pushState)
@@ -294,14 +280,7 @@ $(document).ready(function(){
                 map.fitBounds(bounds);
             }
             else{
-                if(default_bounds)
-                {
-                    map.fitBounds(default_bounds);
-                }
-                else
-                {
-                    map.fitBounds(las_image);
-                }
+                map.fitBounds(init_bounds);
             }
         };
     }

@@ -1,6 +1,6 @@
 from django.contrib.gis.db import models
 from django.core.urlresolvers import reverse
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import pre_save, post_save, pre_delete
 
 from tile.models import MongoCache
 
@@ -64,7 +64,14 @@ def invalidate_new(sender, **kwargs):
     instance = kwargs['instance']
     c.DELETE(get_bounds(instance.geom))
     
+
+def invalidate_remove(sender, **kwargs):
+    c = MongoCache()
+    instance = kwargs['instance']
+    c.DELETE(get_bounds(instance.geom))
+    
 pre_save.connect(invalidate_current, sender=GeoImage, weak=False, dispatch_uid='tram81.geoimage.ic')
 post_save.connect(invalidate_new, sender=GeoImage, weak=False, dispatch_uid='tram81.geoimage.in')
+pre_delete.connect(invalidate_remove, sender=GeoImage, weak=False, dispatch_uid='tram81.geoimage.ir')
         
         
