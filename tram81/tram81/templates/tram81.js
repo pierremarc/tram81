@@ -57,6 +57,9 @@ $(document).ready(function(){
             }
         });
     
+    
+    var hasHistory = false;
+    
     $('#info_box').hide();
     $('#page').hide();
     
@@ -245,6 +248,7 @@ $(document).ready(function(){
             map.fitBounds(this.getBounds());
             if(window.history && window.history.pushState)
             {
+                hasHistory = true;
                 var bnds = this.getBounds();
                 var bounds = {
                     sw:[bnds.getSouth(), bnds.getWest()],
@@ -265,21 +269,21 @@ $(document).ready(function(){
     var las_image = global_images[global_images.length -1].getBounds();
     var init_bounds = default_bounds || las_image;
     map.whenReady(function(){
-            map.fitBounds(init_bounds);
+            window.setTimeout(function(){
+                map.fitBounds(init_bounds);
+            }, 1000);
     });
     map.setView([50.854075572144815, 4.38629150390625], 13);
     
     if(window.history && window.history.pushState)
     {
         window.onpopstate = function(evt){
-//             console.log('popState', evt.state);
             var state = evt.state;
             if(state && state.sw && state.ne){
                 var bounds = L.latLngBounds(state.sw, state.ne);
-                console.log('got bounds!', bounds);
                 map.fitBounds(bounds);
             }
-            else{
+            else if(hasHistory){
                 map.fitBounds(init_bounds);
             }
         };
