@@ -39,17 +39,19 @@ class Command(BaseCommand):
         for image in images:
             self.stdout.write('[buildcache] image %d from zoom %d to %d\n'
                                 % (image.pk, min_zoom, max_zoom - 1))
-            bounds = get_bounds(image.geom)
-            for z in range(min_zoom, max_zoom):
-                minx, maxy = tileXY(bounds['miny'], 
-                                   bounds['minx'], z)
-                
-                maxx, miny = tileXY(bounds['maxy'], 
-                                   bounds['maxx'], z)
-                
-                # we buffer the cache a bit
-                for x in range(minx -1, maxx +1):
-                    for y in range(miny -1, maxy +1):
-                        map_pool.get_map().get_tile(z,x,y)
-        
+            try:
+                bounds = get_bounds(image.geom)
+                for z in range(min_zoom, max_zoom):
+                    minx, maxy = tileXY(bounds['miny'], 
+                                    bounds['minx'], z)
+                    
+                    maxx, miny = tileXY(bounds['maxy'], 
+                                    bounds['maxx'], z)
+                    
+                    # we buffer the cache a bit
+                    for x in range(minx -1, maxx +1):
+                        for y in range(miny -1, maxy +1):
+                            map_pool.get_map().get_tile(z,x,y)
+            except Exception, e:
+                print 'failed: %s'%(e,)
         

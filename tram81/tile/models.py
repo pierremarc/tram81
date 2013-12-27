@@ -111,17 +111,20 @@ class MongoCache(BaseCache):
         
         print 'MongoCache.DELETE: %s'%request
         
-        for item in self.index.find(request):
-            path = item['path']
-            id = item['_id']
-            print 'MongoCache.DELETE: item %s %s'%(id, path)
-            if id is not None:
-                try:
-                    self.index.remove(id)
-                    os.unlink(path)
-                except Exception, e:
-                    print '[MongoCache.DELETE] Failed to delete %s, %s'%(id, path)
-                    print str(e)
+        try:
+            for item in self.index.find(request):
+                path = item['path']
+                id = item['_id']
+                print 'MongoCache.DELETE: item %s %s'%(id, path)
+                if id is not None:
+                    try:
+                        self.index.remove(id)
+                        os.unlink(path)
+                    except Exception, e:
+                        print '[MongoCache.DELETE] Failed to delete %s, %s'%(id, path)
+                        print str(e)
+        except Exception, e:
+            print 'MongoCache.DELETE: %s'%(e,)
                 
             
         return
