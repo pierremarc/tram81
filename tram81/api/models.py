@@ -53,22 +53,31 @@ def get_bounds(poly):
     return dict(minx=minx,miny=miny, maxx=maxx, maxy=maxy)
         
 def invalidate_current(sender, **kwargs):
-    c = MongoCache()
-    instance = kwargs['instance']
-    if instance.id:
-        obj = GeoImage.objects.get(pk=instance.id)
-        c.DELETE(get_bounds(obj.geom))
+    try:
+        c = MongoCache()
+        instance = kwargs['instance']
+        if instance.id:
+            obj = GeoImage.objects.get(pk=instance.id)
+            c.DELETE(get_bounds(obj.geom))
+    except Exception:
+        pass
         
 def invalidate_new(sender, **kwargs):
-    c = MongoCache()
-    instance = kwargs['instance']
-    c.DELETE(get_bounds(instance.geom))
+    try:
+        c = MongoCache()
+        instance = kwargs['instance']
+        c.DELETE(get_bounds(instance.geom))
+    except Exception:
+        pass
     
 
 def invalidate_remove(sender, **kwargs):
-    c = MongoCache()
-    instance = kwargs['instance']
-    c.DELETE(get_bounds(instance.geom))
+    try:
+        c = MongoCache()
+        instance = kwargs['instance']
+        c.DELETE(get_bounds(instance.geom))
+    except Exception:
+        pass
     
 pre_save.connect(invalidate_current, sender=GeoImage, weak=False, dispatch_uid='tram81.geoimage.ic')
 post_save.connect(invalidate_new, sender=GeoImage, weak=False, dispatch_uid='tram81.geoimage.in')
