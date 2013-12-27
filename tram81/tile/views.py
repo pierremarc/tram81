@@ -65,23 +65,31 @@ class ImageMixer(object):
         if not box_is_valid(base_box) or not box_is_valid(top_box):
             return
         bpix = base.load()
-        #tpix = top.load()
-        #print base_box
-        #print top_box
+        
         
         byy = range(base_box.maxy -1, base_box.miny -1, -1)
         bxx = range(base_box.minx, base_box.maxx)
         
         sz = (base_box.maxx - base_box.minx, 
               base_box.maxy - base_box.miny)
+        
         quad = ( top_box.minx, top_box.maxy - 1, # tl
                 top_box.minx, top_box.miny ,  # bl
                 top_box.maxx, top_box.miny ,  # br
                 top_box.maxx, top_box.maxy - 1)  # tr
+        
         #t_tmp = top.transform(sz, Image.QUAD, quad, Image.BICUBIC)
         #tpix = t_tmp.load()
         #t_tmp.save('debug.png')
-        tpix = top.transform(sz, Image.QUAD, quad, Image.BICUBIC).load()
+        #tpix = top.transform(sz, Image.QUAD, quad, Image.BICUBIC).load()
+        
+        cropped_im = top.transform( (top_box.maxx - top_box.minx,
+                                     top_box.maxy - top_box.miny),
+                                    Image.EXTENT, (top_box.minx, top_box.maxy - 1,
+                                                   top_box.maxx, top_box.miny)
+                                    )
+        tpix = cropped_im.resize(sz, Image.ANTIALIAS).load()
+        
         
         for y_idx in xrange(len(byy)):
             by = byy[y_idx]
@@ -145,7 +153,20 @@ class ImageMixer(object):
             return mapnik.Image.fromstring(f.getvalue())
                 
         return tile
-                
+       
+class PILDatasource(mapnik.PythonDatasource):
+    def __init__(self, image, geom):
+        self.image = image
+        self.geom = poly_to_box(geom)
+        super(PILDatasource, self).__init__()
+
+    def features(self, query):
+        bbox = query.bbox
+        ibox = self.geom.intersect(bbox)
+        if not ibox.valid():
+            raise Exception('Invalid intersection')
+        
+
         
 
 class Map(object):
@@ -167,31 +188,7 @@ class Map(object):
         self.proj = mapnik.Projection(self.map.srs)
         self.transform = mapnik.ProjTransform(LONGLAT_PROJ, self.proj)
         self.inverse_transform = mapnik.ProjTransform(self.proj, LONGLAT_PROJ)
-        
-        #self.map.zoom_all()
-        #self.inverse_transform = mapnik.ProjTransform(self.proj, LONGLAT_PROJ)
-        #mb = self.map.envelope()
-        #print 'Map extent: %s; latlon => %s'%(mb, self.inverse_transform.forward(mb))
-        
-        
-        if settings.MAPNIK_DEBUG:
-            gs = GeoImage.objects.all()
-            csv_data = ['wkt, path']
-            
-            for g in gs:
-                csv_data.append('"%s","%s"'%(g.geom.wkt,g.image.path))
-            
-            datasource = mapnik.CSV(inline='\n'.join(csv_data))
-            s = mapnik.Style()
-            r = mapnik.Rule()
-            polygon_symbolizer = mapnik.PolygonSymbolizer(mapnik.Color('#6ADEFC'))
-            r.symbols.append(polygon_symbolizer)
-            s.rules.append(r)
-            self.map.append_style('DebugStyle',s)
-            layer = mapnik.Layer('debug')
-            layer.datasource = datasource
-            layer.styles.append('DebugStyle')
-            self.map.layers.append(layer)
+
             
     
     def get_tile(self, z, x, y):
