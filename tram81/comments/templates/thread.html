@@ -11,6 +11,9 @@
     <div class="login">
     Pour laisser un commentaire, <a href="{% url 'social:begin' 'facebook' %}">connecte toi</a> avec ton compte facebook;
     </div>
+    <div class="login">
+    <a href="{% url 'social:begin' 'facebook' %}"> Log je in </a> via Facebook om je commentaar te geven.
+    </div> 
 {% endif %}
 </div>
 {% for comment in comments %}
