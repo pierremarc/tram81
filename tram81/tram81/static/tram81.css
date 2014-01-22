@@ -1,4 +1,16 @@
-*{margin:0;border:none;padding:0}
+
+@font-face {
+    font-family: 'Reenie Beanie';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Reenie Beanie'), local('ReenieBeanie'), url(http://themes.googleusercontent.com/static/fonts/reeniebeanie/v4/ljpKc6CdXusL1cnGUSamX_n8qdNnd5eCmWXua5W-n7c.woff) format('woff');
+}
+
+*{
+    margin:0;
+    border:none;
+    padding:0;
+}
 
 #map{
     position:absolute;
@@ -7,36 +19,39 @@
 }
 
 #info_box{
+    font-family: 'Reenie Beanie';
     position:absolute;
-    z-index:2;
-/*     top:0;right:0;bottom:0;left:66%; */
-    top:32px;right:32px;bottom:32px;left:32px;
-/*     width:300px; */
-    background-color: white;
-    border: 1px solid grey;
-    padding: 12px;
+    z-index:1000;
+    top:0;right:0;bottom:0;left:0;
+    
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 32px;
     overflow: hidden;
 }
 
 .txt_box{
-    position:absolute;
-    top:32px;right:32px;bottom:32px;left:auto;
-    width:40%;
+/*    position:absolute;
+    top:32px;right:32px;bottom:32px;left:auto;*/
+
+float:left;
+margin: 12px;
+    width:332px;
     overflow: auto;
     padding-right:6px;
 }
 
 .close_box{
     position: absolute;
-    top: 0;
-    right: 6px;
+    top: 32px;
+    right: 32px;
     color: #999;
     font-family: sans-serif;
-    font-size:12pt;
-    cursor:pointer;
+    font-size: 12pt;
+    cursor: pointer;
+    font-weight: bold;
 }
 .close_box:hover{
-    border-bottom: 1px solid;
+    border-bottom: 2px solid;
 }
 
 .comments{
@@ -50,8 +65,14 @@
 }
 
 .time_box{
-    font-family: sans-serif;
-    font-size: 16pt;
+/*    position:absolute;
+    top:200px;
+    left:32px;*/
+
+float:left;
+margin: 12px;
+/*     font-family: sans-serif; */
+    font-size: 22pt;
     margin-bottom: 16px;
     font-weight: bold;
 }
@@ -64,17 +85,26 @@
 }
 
 .txt{
+/*    position:absolute;
+    top:32px;
+    left:256px;*/
+float:left;
+margin: 12px;
+    width:332px;
     margin-bottom: 16px;
-    font-family: sans-serif;
-    font-size: 12pt;
-    padding-right: 100px;
+/*     font-family: sans-serif; */
+    font-size: 18pt;
 }
 
 .img_box{
-    position:absolute;
-    top:32px;right:auto;bottom:32px;left:32px;
-    width:50%;
-    text-align:right;
+/*    position: absolute;
+    top: 32px;
+    left:32px;*/
+
+float:left;
+margin: 12px;
+    border: 1px solid #aaa;
+    padding: 8px;
 }
 
 img.img{
@@ -84,13 +114,13 @@ img.img{
 
 
 .comment-form{
-    margin:22px 0;
+    margin:0 0 22px 0;
 }
 
 .comment-form h3{
-    font-family:sans-serif;
+/*     font-family:sans-serif; */
     color:#444;
-    font-size: 12pt;
+    font-size: 18pt;
 }
 
 .in-wrapper{
@@ -99,7 +129,7 @@ img.img{
 
 #new_comment{
     position: relative;
-    width: 100%;
+    width: 95%;
     height: 120px;
     resize: none; 
     padding:4px;
@@ -117,16 +147,20 @@ img.img{
 #nc{
     padding: 4px;
     margin: 4px;
-    font-family: sans-serif;
+/*     font-family: sans-serif; */
     background-color: white;
     cursor: pointer;
     border:1px solid #bbb;
 }
 
+#nc:hover{
+    color:#bbb;
+}
+
 .comment-box{
     margin:6px 0;
     padding:6px;
-    border:1px solid #ddd;
+/*     border:1px solid #ddd; */
 }
 
 .commenter{
@@ -147,8 +181,8 @@ img.img{
 }
 
 .comment-text{
-    font-family:sans-serif;
-    font-size:10pt;
+/*     font-family:sans-serif; */
+    font-size:15pt;
 }
 
 #pages{
