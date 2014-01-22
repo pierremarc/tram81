@@ -17,6 +17,7 @@ window.T81.data = [
     pk: {{ image.pk }},
     url: '{% url 'index' pk=image.pk %}',
     img_url: '{{ image.image.url }}',
+    img_thumnail_url: '{{ image.img_thumbnail }}',
     geo: JSON.parse('{{ image.geom.geojson }}'),
     txt: '{{ image.text|md|escapejs }}',
     pub: formatDate(new Date('{{ image.pub_date|date:"c" }}')),
@@ -221,8 +222,8 @@ $(document).ready(function(){
             
             var comment = resetComments(this.data.pub, $('<div />').addClass('cinner'));
             var img = $('<img />').addClass('img')
-            img.attr('src', this.data.img_url);
-            var link = $('<a />').attr('href', this.data.url);
+            img.attr('src', this.data.img_thumnail_url);
+            var link = $('<a />').attr('href', this.data.img_url).attr('target','_blank');
             link.append(img);
             
             txt.time.html('<a href="/'+this.data.pub+'">'+this.data.pub+'</a>');
@@ -230,14 +231,25 @@ $(document).ready(function(){
             txt.close.on('click',function(){hidePanel();});
             
             ui.img_box.append(link);
-            _.each(txt, function($el){
-                ui.txt_box.append($el);
-            });
+            
             
             $info.empty();
+            $info.append(txt.time);
+            $info.append(ui.img_box);
+            if(this.data.txt 
+                && this.data.txt.length > 12)
+            {
+                $info.append(txt.txt);
+            }
+            $info.append(ui.txt_box);
+            $info.append(txt.close);
+            /*
             _.each(ui, function($el){
                 $info.append($el);
             });
+            _.each(txt, function($el){
+                $info.append($el);
+            });*/
             ui.txt_box.append(comment);
             
             
