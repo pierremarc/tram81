@@ -238,7 +238,7 @@ $(document).ready(function(){
                 txt_box: $('<div />').addClass('txt_box'),
             };
             var txt = {
-                close: $('<close>fermer</close>').addClass('close_box'),
+                close: $('<div>fermer</div>').addClass('close_box'),
                 time: $('<div />').addClass('time_box'),
                 txt: $('<div />').addClass('txt'),
 //                 link: $('<div />').addClass('link_box'),
