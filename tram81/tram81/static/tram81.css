@@ -25,7 +25,7 @@
     background-color: white;
     background-color: rgba(255, 255, 255, 0.95);
     padding: 32px;
-    overflow: hidden;
+    overflow: auto;
 }
 
 .txt_box{
@@ -90,7 +90,7 @@ margin: 12px;
     margin-bottom: 16px;
     font-size: 18pt;
     overflow-y: auto;
-    max-height: 86%;
+/*     max-height: 86%; */
 }
 
 .img_box{
