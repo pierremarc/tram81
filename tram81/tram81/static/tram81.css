@@ -83,7 +83,7 @@ margin: 12px;
     border-bottom:2px solid;
 }
 
-.txt
+.txt{
     float:left;
     margin: 12px;
     width:332px;
@@ -105,8 +105,8 @@ margin: 12px;
 }
 
 img.img{
-    width:100%;
-    height:100%;
+/*    width:100%;
+    height:100%;*/
 }
 
 
