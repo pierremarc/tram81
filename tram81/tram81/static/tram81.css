@@ -84,7 +84,7 @@ margin: 12px;
     margin: 12px;
     width:332px;
     margin-bottom: 16px;
-    font-size: 18pt;
+    font-size: 12pt;
     overflow-y: auto;
 /*     max-height: 86%; */
 }
@@ -113,7 +113,7 @@ img.img{
 .comment-form h3{
 /*     font-family:sans-serif; */
     color:#444;
-    font-size: 18pt;
+    font-size: 12pt;
 }
 
 .in-wrapper{
@@ -175,7 +175,7 @@ img.img{
 
 .comment-text{
 /*     font-family:sans-serif; */
-    font-size:15pt;
+    font-size:10pt;
 }
 
 #pages{
