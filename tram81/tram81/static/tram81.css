@@ -1,9 +1,5 @@
-@font-face {
-    font-family: 'Reenie Beanie';
-    font-style: normal;
-    font-weight: 400;
-    src: local('Reenie Beanie'), local('ReenieBeanie'), url(http://themes.googleusercontent.com/static/fonts/reeniebeanie/v4/ljpKc6CdXusL1cnGUSamX_n8qdNnd5eCmWXua5W-n7c.woff) format('woff');
-}
+
+@import url(http://fonts.googleapis.com/css?family=Quicksand:300,400,700);
 
 *{
     margin:0;
@@ -18,7 +14,7 @@
 }
 
 #info_box{
-    font-family: 'Reenie Beanie';
+    font-family: 'Quicksand';
     position:absolute;
     z-index:1000;
     top:0;right:0;bottom:0;left:0;
