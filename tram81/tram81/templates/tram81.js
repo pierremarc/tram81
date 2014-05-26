@@ -252,7 +252,7 @@ $(document).ready(function(){
             var link = $('<a />').attr('href', this.data.img_url).attr('target','_blank');
             link.append(img);
             
-            txt.time.html('<a href="/'+this.data.pub+'">'+this.data.pub+'</a>');
+            txt.time.html('<a href="/'+this.data.pk+'">'+this.data.pub+'</a>');
             txt.txt.html(this.data.txt);
             txt.close.on('click',function(){
                 if(window.history && window.history.back) {
