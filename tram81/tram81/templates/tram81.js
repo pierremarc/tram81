@@ -42,6 +42,7 @@ window.T81.data = [
     pk: {{ image.pk }},
     url: '{% url 'index' pk=image.pk %}',
     img_url: '{{ image.image.url }}',
+    img_large_url: '{{ image.img_large }}',
     img_thumnail_url: '{{ image.img_thumbnail }}',
     geo: JSON.parse('{{ image.geom.geojson }}'),
     txt: '{{ image.text|md|escapejs }}',
@@ -238,7 +239,7 @@ $(document).ready(function(){
                 txt_box: $('<div />').addClass('txt_box'),
             };
             var txt = {
-                close: $('<div>fermer</div>').addClass('close_box'),
+                close: $('<div>×</div>').addClass('close_box'),
                 time: $('<div />').addClass('time_box'),
                 txt: $('<div />').addClass('txt'),
 //                 link: $('<div />').addClass('link_box'),
@@ -247,13 +248,21 @@ $(document).ready(function(){
             
             var comment = resetComments(this.data.pub, $('<div />').addClass('cinner'));
             var img = $('<img />').addClass('img')
-            img.attr('src', this.data.img_thumnail_url);
+            img.attr('src', this.data.img_large_url);
             var link = $('<a />').attr('href', this.data.img_url).attr('target','_blank');
             link.append(img);
             
             txt.time.html('<a href="/'+this.data.pub+'">'+this.data.pub+'</a>');
             txt.txt.html(this.data.txt);
-            txt.close.on('click',function(){hidePanel();});
+            txt.close.on('click',function(){
+                if(window.history && window.history.back) {
+                    window.history.back();
+                }
+                else{
+                    hidePanel();
+                }
+                
+            });
             
             ui.img_box.append(link);
             
@@ -261,12 +270,12 @@ $(document).ready(function(){
             $info.empty();
             $info.append(txt.time);
             $info.append(ui.img_box);
-            if(this.data.txt 
-                && this.data.txt.length > 12)
-            {
-                $info.append(txt.txt);
-            }
-            $info.append(ui.txt_box);
+//             if(this.data.txt 
+//                 && this.data.txt.length > 12)
+//             {
+//                 $info.append(txt.txt);
+//             }
+//             $info.append(ui.txt_box);
             $info.append(txt.close);
             /*
             _.each(ui, function($el){
@@ -275,7 +284,13 @@ $(document).ready(function(){
             _.each(txt, function($el){
                 $info.append($el);
             });*/
-            ui.txt_box.append(comment);
+//             ui.txt_box.append(comment);
+
+            if(window.history && window.history.pushState)
+            {
+                hasHistory = true;
+                window.history.pushState( {}, '', 'i/' + this.data.pk);
+            }
             
             
             showPanel();
@@ -291,7 +306,7 @@ $(document).ready(function(){
                     sw:[bnds.getSouth(), bnds.getWest()],
                     ne:[bnds.getNorth(), bnds.getEast()],
                 }
-//                 console.log('pushState', this.data.pk, bounds);
+                
                 window.history.pushState(
                     bounds,
                     this.data.img_url,
@@ -314,8 +329,14 @@ $(document).ready(function(){
     
     if(window.history && window.history.pushState)
     {
+        
         window.onpopstate = function(evt){
             var state = evt.state;
+            {% if HAS_COMMENTS %}
+            
+            hidePanel();
+            
+            {% else %}
             if(state && state.sw && state.ne){
                 var bounds = L.latLngBounds(state.sw, state.ne);
                 map.fitBounds(bounds);
@@ -323,6 +344,7 @@ $(document).ready(function(){
             else if(hasHistory){
                 map.fitBounds(init_bounds);
             }
+            {% endif %}
         };
     }
 
