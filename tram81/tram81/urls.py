@@ -3,7 +3,6 @@ from django.conf.urls import patterns, include, url
 from .views import IndexView, JSConf
 
 from django.contrib import admin
-admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^(?P<y>\d{4})-(?P<m>\d{2})-(?P<d>\d{2})$', IndexView.as_view(), name='archive'),
@@ -16,3 +15,5 @@ urlpatterns = patterns('',
     url(r'^social/', include('social.apps.django_app.urls', namespace='social')),
     url(r'^bulk/$','tram81.bulk.view'),
 )
+
+admin.autodiscover()
