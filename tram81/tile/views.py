@@ -130,13 +130,11 @@ class ImageMixer(object):
                     pass
 
                 if geo_image.rotation > 0:
-                    box_width = int(box.maxx - box.minx)
-                    box_height = int(box.maxy - box.miny)
-                    # dst_im = Image.new("RGBA", (box_width, box_height), "white")
                     rgba_im = im.convert('RGBA')
                     # rotated_im = rgba_im.rotate(geo_image.rotation, filter=Image.BICUBIC, expand=True)
                     rotated_im = rgba_im.rotate(geo_image.rotation, expand=True)
-                    im = rotated_im
+                    im = Image.new("RGBA", rotated_im.size, "white")
+                    im.paste(rotated_im, (0,0), rotated_im)
                 
                 # project intersection on image
                 ox = self._ts(ibox.minx, box.minx, box.maxx, im.size[0])
