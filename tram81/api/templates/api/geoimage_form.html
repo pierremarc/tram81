@@ -53,6 +53,15 @@
 <script src="{{STATIC_URL}}geom.js"></script>
 <script>
 
+
+function reverseRotate(r){
+    if(0 === r || 360 === r){
+        return 0;
+    }
+
+    return 360 - r;
+};
+
 jQuery(document).ready(function($){
 
     var $d = $('#d');
@@ -86,7 +95,7 @@ jQuery(document).ready(function($){
 
     function rotate(){
         $wrapper.css({
-            transform: 'rotate('+rotationValue+'deg)',
+            transform: 'rotate('+reverseRotate(rotationValue)+'deg)',
         });
     };
 
@@ -99,14 +108,32 @@ jQuery(document).ready(function($){
             var h = E.height();
 
             console.log('updateGeometry', x, y, w, h);
+
+            var path = new Geom.Path();
+            path.add(new Geom.Point(x,   y))
+                .add(new Geom.Point(x+w, y))
+                .add(new Geom.Point(x+w, y+h))
+                .add(new Geom.Point(x,   y+h))
+                .add(new Geom.Point(x,   y));
+
+            var transform = new Geom.Transform();
+            transform.translate(x,y);
+            transform.rotate(rotationValue, (new Geom.Rect(x,y,w,h)).center());
+
+            path.transform(transform);
+
+            var pts_ll = _.map(path.points, function(point){
+                return map.containerPointToLatLng(new L.Point(point.x, point.y));
+            });
             
-            var pts_ll = [
+            var pts_ll_OLD = [
                 map.containerPointToLatLng(new L.Point(x,   y)),
                 map.containerPointToLatLng(new L.Point(x+w, y)),
                 map.containerPointToLatLng(new L.Point(x+w, y+h)),
                 map.containerPointToLatLng(new L.Point(x,   y+h)),
                 map.containerPointToLatLng(new L.Point(x,   y)),
-            ]
+            ];
+
             var pts_str = _.map(pts_ll, function(ll){
                 return ll.lng+' '+ll.lat;
             }).join(',');
@@ -196,10 +223,45 @@ jQuery(document).ready(function($){
     {% autoescape off %}
     function setupuGeoImage(evt){
         map.once('viewreset', function(evt){
-            var ix = map.latLngToContainerPoint(gb.getNorthWest()).x;
-            var iy = map.latLngToContainerPoint(gb.getNorthWest()).y;
-            var iw = map.latLngToContainerPoint(gb.getNorthEast()).x - ix;
-            var ih = map.latLngToContainerPoint(gb.getSouthWest()).y - iy;
+            var ix, iy, iw, ih;
+            if(0 === {{object.rotation}}){
+                ix = map.latLngToContainerPoint(gb.getNorthWest()).x;
+                iy = map.latLngToContainerPoint(gb.getNorthWest()).y;
+                iw = map.latLngToContainerPoint(gb.getNorthEast()).x - ix;
+                ih = map.latLngToContainerPoint(gb.getSouthWest()).y - iy;
+            }
+            else{ // a bit more complicated :)
+
+                var nwPt = map.latLngToContainerPoint(gb.getNorthWest());
+                var sePt = map.latLngToContainerPoint(gb.getSouthEast());
+                var bbRect = new Geom.Rect(nwPt.x, nwPt.y, sePt.x - nwPt.x, sePt.y - nwPt.y);
+                var center = bbRect.center();
+                var path = new Geom.Path;
+
+                var coords = _.reduce(cur_geom.coordinates[0], function(memo, pt){
+                    memo.add(map.latLngToContainerPoint([pt[1], pt[0]]));
+                    return memo;
+                }, path)
+
+                var T = new Geom.Transform;
+                T.rotate(-{{object.rotation}}, center);
+                path.transform(T);
+
+                var minx = 100000, miny = 100000, maxx = -100000, maxy = -100000;
+                _.each(path.points, function(pt){
+                    minx = Math.min(minx, pt.x);
+                    maxx = Math.max(maxx, pt.x);
+                    miny = Math.min(miny, pt.y);
+                    maxy = Math.max(maxy, pt.y);
+                });
+
+                ix = minx;
+                iy = miny;
+                iw = maxx - minx;
+                ih = maxy - miny;
+                // iw = 200;
+                // ih = 200;
+            }
             $img = $('<img />');
             $img.css({
                 opacity:'0.7',
@@ -277,13 +339,13 @@ jQuery(document).ready(function($){
         max:360,
     });
     {% if object %}
-    $rotator.slider("option", "value", {{ object.rotation|default:0 }});
+    $rotator.slider("option", "value", reverseRotate({{ object.rotation|default:0 }}));
     rotationValue = {{ object.rotation|default:0 }};
     {% endif %}
 
     $rotator.on('slide', function(event, ui){
-        $rotation.val(ui.value); 
-        rotationValue = ui.value;
+        rotationValue = reverseRotate(ui.value);
+        $rotation.val(rotationValue); 
         updateGeometry();   
     });
 

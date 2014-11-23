@@ -1,6 +1,7 @@
 # Create your views here.
 
 import os
+import math
 from collections import namedtuple
 
 from django.conf import settings
@@ -127,6 +128,15 @@ class ImageMixer(object):
                     im = Image.open(geo_image.image.path)
                 except Exception:
                     pass
+
+                if geo_image.rotation > 0:
+                    box_width = int(box.maxx - box.minx)
+                    box_height = int(box.maxy - box.miny)
+                    # dst_im = Image.new("RGBA", (box_width, box_height), "white")
+                    rgba_im = im.convert('RGBA')
+                    # rotated_im = rgba_im.rotate(geo_image.rotation, filter=Image.BICUBIC, expand=True)
+                    rotated_im = rgba_im.rotate(geo_image.rotation, expand=True)
+                    im = rotated_im
                 
                 # project intersection on image
                 ox = self._ts(ibox.minx, box.minx, box.maxx, im.size[0])
@@ -142,6 +152,7 @@ class ImageMixer(object):
                 b_dy = self._ts(ibox.miny, bbox.maxy, bbox.miny, src_image.size[1])
                 B = round_box(mapnik.Box2d(b_ox, b_oy, b_dx, b_dy))
                 
+
                 self.op_multiply(src_image, im, B, O)
                 
             #AB = round_box(mapnik.Box2d(0,0,base.size[0],base.size[1]))
