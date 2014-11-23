@@ -15,6 +15,7 @@ class GeoImage(models.Model):
                               width_field='width', 
                               max_length=124)
     geom = models.PolygonField(srid=4326)
+    rotation = models.IntegerField(default=0)
     objects = models.GeoManager()
     
     

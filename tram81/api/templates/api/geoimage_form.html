@@ -50,6 +50,7 @@
 <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
 <script src="{{STATIC_URL}}datepicker/js/bootstrap-datepicker.js"></script>
+<script src="{{STATIC_URL}}geom.js"></script>
 <script>
 
 jQuery(document).ready(function($){
@@ -78,14 +79,26 @@ jQuery(document).ready(function($){
     var img = new Image;
     var $img = $(img);
     var $wrapper = $('<div />');
+
+    var rotationValue = 0;
     
     /// UPDATE GEOM ///////////////////
+
+    function rotate(){
+        $wrapper.css({
+            transform: 'rotate('+rotationValue+'deg)',
+        });
+    };
+
     function updateGeometry(){
+            rotate();
             var E = $wrapper;
             var x = E.position().left;
             var y = E.position().top;
             var w = E.width();
             var h = E.height();
+
+            console.log('updateGeometry', x, y, w, h);
             
             var pts_ll = [
                 map.containerPointToLatLng(new L.Point(x,   y)),
@@ -255,6 +268,27 @@ jQuery(document).ready(function($){
     $('#form_add').on('submit', function(evt){
         updateGeometry();
     });
+
+    var $rotator = $('.rotator');
+    var $rotation = $('#rot');
+    
+    $rotator.slider({
+        min:0,
+        max:360,
+    });
+    {% if object %}
+    $rotator.slider("option", "value", {{ object.rotation|default:0 }});
+    rotationValue = {{ object.rotation|default:0 }};
+    {% endif %}
+
+    $rotator.on('slide', function(event, ui){
+        $rotation.val(ui.value); 
+        rotationValue = ui.value;
+        updateGeometry();   
+    });
+
+
+
 })
 
 </script>
@@ -272,6 +306,7 @@ jQuery(document).ready(function($){
 {% endif %}
 {% csrf_token %}
     <input name="geom" type="hidden" id="wkt" value="{%if object%}{{object.geom.wkt}}{% endif %}"></input>
+    <input name="rotation" type="hidden" id="rot" value="{{object.rotation}}"></input>
     <div class="form-group">
         <label for="f">
             Image a inserer
@@ -299,6 +334,14 @@ jQuery(document).ready(function($){
         </h3>
         <textarea class="form-control" name="text" rows="8">{{ object.text|default:'' }}</textarea>
     </div>
+
+    <div class="form-group">
+        <h3>
+            Rotaion
+        </h3>
+        <div class="rotator"></div>
+    </div>
+
     <button type="submit" class="btn btn-primary" id="submit" >enregistrer</button>
 </form>
 

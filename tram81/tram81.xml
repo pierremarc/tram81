@@ -29,50 +29,14 @@
     <LineSymbolizer stroke-width="2" stroke="#16b84e" />
   </Rule>
 </Style>
-<Layer name="trams"
-  srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over">
-    <StyleName>trams</StyleName>
-    <Datasource>
-        <Parameter name="estimate_extent">false</Parameter>
-       <Parameter name="type"><![CDATA[postgis]]></Parameter>
-       <Parameter name="table"><![CDATA[coline_line]]></Parameter>
-       <Parameter name="key_field"><![CDATA[]]></Parameter>
-       <Parameter name="geometry_field"><![CDATA[]]></Parameter>
-       <Parameter name="dbname"><![CDATA[geo0]]></Parameter>
-       <Parameter name="host"><![CDATA[xvm-5-152.ghst.net]]></Parameter>
-       <Parameter name="port"><![CDATA[5432]]></Parameter>
-       <Parameter name="user"><![CDATA[tram]]></Parameter>
-       <Parameter name="password"><![CDATA[plokplok]]></Parameter>
-       <Parameter name="id"><![CDATA[trams]]></Parameter>
-       <Parameter name="project"><![CDATA[tram81]]></Parameter>
-       <Parameter name="srs"><![CDATA[+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over]]></Parameter>
-    </Datasource>
-  </Layer>
+
 
 <Style name="stops" filter-mode="first">
   <Rule>
     <MarkersSymbolizer width="6" fill="#ff4455" stroke="#995566" allow-overlap="true" />
   </Rule>
 </Style>
-<Layer name="stops"
-  srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over">
-    <StyleName>stops</StyleName>
-    <Datasource>
-        <Parameter name="estimate_extent">false</Parameter>
-       <Parameter name="type"><![CDATA[postgis]]></Parameter>
-       <Parameter name="table"><![CDATA[coline_point]]></Parameter>
-       <Parameter name="key_field"><![CDATA[]]></Parameter>
-       <Parameter name="geometry_field"><![CDATA[]]></Parameter>
-       <Parameter name="dbname"><![CDATA[geo0]]></Parameter>
-       <Parameter name="host"><![CDATA[xvm-5-152.ghst.net]]></Parameter>
-       <Parameter name="port"><![CDATA[5432]]></Parameter>
-       <Parameter name="user"><![CDATA[tram]]></Parameter>
-       <Parameter name="password"><![CDATA[plokplok]]></Parameter>
-       <Parameter name="id"><![CDATA[stops]]></Parameter>
-       <Parameter name="project"><![CDATA[tram81]]></Parameter>
-       <Parameter name="srs"><![CDATA[+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over]]></Parameter>
-    </Datasource>
-  </Layer>
+
 
 <Style name="poly" filter-mode="first">
   <Rule>
@@ -83,22 +47,6 @@
     <LineSymbolizer stroke="#5a5e6b" stroke-width="0.5" />
   </Rule>
 </Style>
-<Layer name="poly"
-  srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over">
-    <StyleName>poly</StyleName>
-    <Datasource>
-        <Parameter name="estimate_extent">false</Parameter>
-<!--        <Parameter name="cursor_size"><![CDATA[300000]]></Parameter> -->
-       <Parameter name="type"><![CDATA[postgis]]></Parameter>
-       <Parameter name="table"><![CDATA[coline_polygon]]></Parameter>
-       <Parameter name="key_field"><![CDATA[]]></Parameter>
-       <Parameter name="geometry_field"><![CDATA[]]></Parameter>
-       <Parameter name="dbname"><![CDATA[geo0]]></Parameter>
-       <Parameter name="host"><![CDATA[xvm-5-152.ghst.net]]></Parameter>
-       <Parameter name="port"><![CDATA[5432]]></Parameter>
-       <Parameter name="user"><![CDATA[tram]]></Parameter>
-       <Parameter name="password"><![CDATA[plokplok]]></Parameter>
-    </Datasource>
-  </Layer>
+
 
 </Map>
