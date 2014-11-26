@@ -1,0 +1,196 @@
+{
+  "bounds": [
+    3.9147,
+    50.4379,
+    3.987,
+    50.4679
+  ],
+  "center": [
+    3.9521,
+    50.4545,
+    15
+  ],
+  "format": "png8",
+  "interactivity": false,
+  "minzoom": 14,
+  "maxzoom": 22,
+  "srs": "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over",
+  "Stylesheet": [
+    "style.mss",
+    "labels",
+    "roads",
+    "waterways",
+    "buildings"
+  ],
+  "Layer": [
+    {
+      "geometry": "polygon",
+      "extent": [
+        3.821863787054755,
+        50.39243828771505,
+        4.097358713632185,
+        50.51278374029152
+      ],
+      "id": "natural",
+      "class": "natural",
+      "Datasource": {
+        "file": "/Volumes/big/atelier_carto/PROJECTS/MONS2015/package-tilemill/shp/natural.shp",
+        "id": "natural",
+        "project": "mons",
+        "srs": ""
+      },
+      "srs-name": "autodetect",
+      "srs": "",
+      "advanced": {},
+      "name": "natural",
+      "layer": null
+    },
+    {
+      "geometry": "linestring",
+      "extent": [
+        3.822110288956361,
+        50.39241839711918,
+        4.0973243397158425,
+        50.51280189805668
+      ],
+      "id": "waterways",
+      "class": "waterways",
+      "Datasource": {
+        "file": "/Volumes/big/atelier_carto/PROJECTS/MONS2015/package-tilemill/shp/waterways.shp"
+      },
+      "srs-name": "autodetect",
+      "srs": "",
+      "advanced": {},
+      "name": "waterways",
+      "layer": null
+    },
+    {
+      "geometry": "polygon",
+      "extent": [
+        3.8223317410408297,
+        50.39235384242473,
+        4.0973192108600855,
+        50.51278262587295
+      ],
+      "id": "buildings",
+      "class": "",
+      "Datasource": {
+        "file": "/Volumes/big/atelier_carto/PROJECTS/MONS2015/package-tilemill/shp/buildings.shp"
+      },
+      "layer": null,
+      "srs-name": "autodetect",
+      "srs": "",
+      "advanced": {},
+      "name": "buildings"
+    },
+    {
+      "geometry": "linestring",
+      "extent": [
+        3.821809542350455,
+        50.39234437401277,
+        4.097369363618075,
+        50.51284627653514
+      ],
+      "id": "roads",
+      "class": "roads",
+      "Datasource": {
+        "file": "/Volumes/big/atelier_carto/PROJECTS/MONS2015/package-tilemill/shp/roads.shp",
+        "id": "roads",
+        "project": "metrolab2",
+        "srs": ""
+      },
+      "srs-name": "autodetect",
+      "srs": "",
+      "advanced": {},
+      "name": "roads",
+      "layer": null
+    },
+    {
+      "geometry": "linestring",
+      "extent": [
+        3.8221368247941108,
+        50.392517871694174,
+        4.097318431568978,
+        50.512804332309734
+      ],
+      "id": "railways",
+      "class": "",
+      "Datasource": {
+        "file": "/Volumes/big/atelier_carto/PROJECTS/MONS2015/package-tilemill/shp/railways.shp",
+        "id": "railways",
+        "project": "metrolab2",
+        "srs": ""
+      },
+      "srs-name": "autodetect",
+      "srs": "",
+      "advanced": {},
+      "name": "railways",
+      "layer": null
+    },
+    {
+      "geometry": "point",
+      "extent": [
+        3.8276077,
+        50.392973,
+        4.0922224,
+        50.4971875
+      ],
+      "id": "places",
+      "class": "places",
+      "Datasource": {
+        "file": "/Volumes/big/atelier_carto/PROJECTS/MONS2015/package-tilemill/shp/places.shp"
+      },
+      "srs-name": "autodetect",
+      "srs": "",
+      "advanced": {},
+      "name": "places",
+      "layer": null
+    },
+    {
+      "geometry": "linestring",
+      "extent": [
+        3.821809542350455,
+        50.39234437401277,
+        4.097369363618075,
+        50.51284627653514
+      ],
+      "id": "roads-labels",
+      "class": "roads-label",
+      "Datasource": {
+        "file": "/Volumes/big/atelier_carto/PROJECTS/MONS2015/package-tilemill/shp/roads.shp"
+      },
+      "srs-name": "autodetect",
+      "srs": "",
+      "advanced": {},
+      "name": "roads-labels",
+      "layer": null
+    },
+    {
+      "geometry": "linestring",
+      "extent": [
+        3.822110288956361,
+        50.39241839711918,
+        4.0973243397158425,
+        50.51280189805668
+      ],
+      "id": "waterways-labels",
+      "class": "",
+      "Datasource": {
+        "file": "/Volumes/big/atelier_carto/PROJECTS/MONS2015/package-tilemill/shp/waterways.shp",
+        "id": "waterways-labels",
+        "project": "mons",
+        "srs": ""
+      },
+      "srs-name": "autodetect",
+      "srs": "",
+      "advanced": {},
+      "name": "waterways-labels",
+      "layer": null
+    }
+  ],
+  "scale": 1,
+  "metatile": 4,
+  "name": "mons 2015",
+  "description": "fond de carte mons 2015",
+  "attribution": ""
+}

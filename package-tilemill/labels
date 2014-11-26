@@ -1,0 +1,213 @@
+/* ================================================================== */
+/* PLACE NAMES
+/* ================================================================== */
+
+/* ---- Cities ------------------------------------------------------ */
+
+
+#places::city[type='city'][zoom>=8][zoom<=15],
+#places::city[type='town'][zoom>11][zoom<=15]{
+  text-name:"[name].replace(' - ','_')";  
+  text-wrap-width: 1;
+  text-wrap-before: true;
+  text-wrap-character: '_';
+
+  text-face-name:@place-label;
+  text-placement:point;
+  text-fill:@place-label-color;
+  text-halo-fill:@background-color;
+  text-halo-radius:2;
+  text-transform: uppercase;
+  text-character-spacing: 1.5;
+
+
+
+  [zoom<=8] {
+    text-size: 6;
+    text-halo-radius:1;
+  }
+  [zoom=9] {
+    text-size:7;
+    text-wrap-width: 60;
+  }
+  [zoom=10] {
+    text-size:8;
+    text-wrap-width: 70;
+  }
+  [zoom=11] {
+    text-size:9;
+    text-wrap-width: 80;
+  }
+  [zoom=12] {
+    text-size:14;
+    text-wrap-width: 100;
+  }
+  [zoom=13] {
+    text-size:16;
+    text-character-spacing: 2.5;
+    text-wrap-width: 200;
+  }
+  [zoom=14] {
+    text-size:18;
+    text-character-spacing: 4;
+    text-wrap-width: 300;
+    
+  }
+  [zoom=15] {
+    text-size:20;
+    text-character-spacing: 6;
+    text-wrap-width: 400;
+  }
+}
+
+
+/* ---- Other small places ------------------------------------------ */
+
+#places::small[type='village'][zoom>=14],
+#places::small[type='suburb'][zoom>=14],
+#places::small[type='hamlet'][zoom>=14] {
+  text-name:'[name]';
+  text-face-name:@place-label;
+  text-placement:point;
+  text-fill:@place-label-color;
+  text-size:10;
+  text-halo-fill:@background-color;
+  text-halo-radius:2;
+  text-wrap-width: 30;
+  text-character-spacing: 1.5;
+  text-transform: uppercase;
+
+  [zoom>=14] {
+    text-size:11;
+    text-wrap-width: 40;
+    text-line-spacing: 1;
+  }
+  [zoom>=15] {
+    text-transform: uppercase;
+    text-wrap-width: 60; 
+    text-line-spacing: 1;
+  }
+  [zoom>=16] {
+    text-size:12;
+    text-character-spacing: 2;
+    text-wrap-width: 120;
+    text-line-spacing: 2;
+  } 
+  [zoom>=17] {
+    text-size:13; 
+    text-character-spacing: 3;
+    text-wrap-width: 160;
+    text-line-spacing: 4;
+  }
+  [zoom>=18] {
+    text-size:14;
+    text-character-spacing: 4;
+    text-line-spacing: 6;
+  }
+}
+
+#places::small[type='locality'][zoom>=15] {
+  text-name:'[name]';
+  text-face-name:@place-label;
+  text-placement:point;
+  text-fill:@place-label-color;
+  text-size:9;
+  text-halo-fill:@background-color;
+  text-halo-radius:2;
+  text-wrap-width: 30;
+  text-character-spacing: 1;
+  text-transform: uppercase;
+  [zoom>=16] {
+    text-size:10;
+    text-wrap-width: 60;
+    text-line-spacing: 1;
+  }
+  [zoom>=17] {
+    text-size:11;
+    text-wrap-width: 120;
+    text-line-spacing: 2;
+  }
+  [zoom>=18] {
+    text-size:12;
+    text-character-spacing: 1;
+    text-line-spacing: 4;
+  }
+}
+
+/* ================================================================== */
+/* WATERWAY LABELS
+/* ================================================================== */
+
+#waterways-labels[type='river'][zoom>=13],
+#waterways-labels[type='canal'][zoom>=13],
+#waterways-labels[type='stream'][zoom>=15] {
+  text-name: '[name]';
+  text-face-name: @water-label;
+  text-fill: @water * 0.8;
+  text-halo-fill: @background-color;
+  text-halo-radius: 2;
+  text-placement: line;
+  text-min-distance: 450;
+  text-size: 10;
+  [type='river'][zoom=14],
+  [type='canal'][zoom=14],
+  [type='stream'][zoom=16] {
+    text-name: "[name].replace('([\S\ ])','$1 ')";
+  }
+  [type='river'][zoom=15],
+  [type='canal'][zoom=15] {
+    text-size: 10;
+    text-name: "[name].replace('([\S\ ])','$1 ')";
+  }
+  [type='river'][zoom>=16],
+  [type='canal'][zoom>=16] {
+    text-size: 12;
+    text-name: "[name].replace('([\S\ ])','$1 ')";
+    text-spacing: 300;
+  }
+}
+
+/* ================================================================== */
+/* ROAD LABELS
+/* ================================================================== */
+
+#roads-labels {
+  text-name:'[name]';
+  text-face-name:@road-label;
+  text-placement:line;
+  text-fill:@road-label-color;
+  text-halo-fill:@background-color;
+  text-halo-radius:2;
+  text-avoid-edges: true;
+  text-min-path-length: 0;
+  text-max-char-angle-delta: 0;
+  text-spacing: 100;
+  text-min-distance: 200;
+  text-allow-overlap: false;
+  
+  [zoom>17] {text-halo-radius:3;}
+  [zoom<=19]{text-max-char-angle-delta: 22.5;}
+  
+  [zoom>=22] {text-size:80; text-character-spacing: 5.0;}
+  [zoom=21]  {text-size:60; text-character-spacing: 4.0;}
+  [zoom=20]  {text-size:40; text-character-spacing: 3.0;}
+  [zoom=19]  {text-size:18; text-character-spacing: 2.6;}
+  [zoom=18]  {text-size:12; text-character-spacing: 2.3;}
+  [zoom=17]  {text-size:10; text-character-spacing: 2.0;}
+  [zoom=16]  {text-size:8; text-character-spacing: 1.6;}
+  [zoom<=15] {text-name:'';}
+}
+
+
+#roads-labels 
+[name='Grand-Place'],
+[name='Place Nervienne'],
+[name='Place Spira'],
+[name='Place de Vannes'],
+[name='Marché aux Herbes'],
+[name='Croix-Place'],
+[name='Place des Archers']{
+}
+
+
+

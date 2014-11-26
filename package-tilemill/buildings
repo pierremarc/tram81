@@ -1,0 +1,23 @@
+#buildings {
+  line-color: (@white - 20%);
+  polygon-fill: (@white - 10%);
+  line-width: 2;
+  
+  [zoom>=21] {
+    line-color: (@white - 15%);
+    polygon-fill: @white;
+  }
+  
+  [zoom=19], [zoom=20] {
+    line-color: (@white - 15%);
+    polygon-fill: (@white - 5%);
+  }
+  
+  [zoom=18]  {
+    polygon-fill: (@white - 7%);
+  }
+  
+  [zoom=17]  {line-width: 1}
+  [zoom<=16] {line-width: 0}
+}
+
