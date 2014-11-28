@@ -106,7 +106,7 @@ def debug_view(req, pk, zoom):
 
 class ImageCreate(LoginRequiredMixin, CreateView):
     model = GeoImage
-    fields = ['image','geom', 'pub_date', 'text']
+    fields = ['image','geom', 'pub_date', 'text', 'rotation']
     
     def get_context_data(self, **kwargs):
         context = super(ImageCreate, self).get_context_data(**kwargs)
@@ -117,7 +117,7 @@ class ImageCreate(LoginRequiredMixin, CreateView):
 
 class ImageUpdate(LoginRequiredMixin, UpdateView):
     model = GeoImage
-    fields = ['image','geom', 'pub_date', 'text']
+    fields = ['image','geom', 'pub_date', 'text', 'rotation']
     
     def get_context_data(self, **kwargs):
         context = super(ImageUpdate, self).get_context_data(**kwargs)
