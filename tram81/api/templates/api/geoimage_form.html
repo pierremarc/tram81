@@ -371,7 +371,7 @@ jQuery(document).ready(function($){
 {% endif %}
 {% csrf_token %}
     <input name="geom" type="hidden" id="wkt" value="{%if object%}{{object.geom.wkt}}{% endif %}"></input>
-    <input name="rotation" type="hidden" id="rot" value="{{object.rotation}}"></input>
+    <input name="rotation" type="hidden" id="rot" value="{{ object.rotation|default:0 }}"></input>
     <div class="form-group">
         <label for="f">
             Image a inserer
