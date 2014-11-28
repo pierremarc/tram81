@@ -318,14 +318,16 @@ $(document).ready(function(){
         });
     };
     _.each(window.T81.data, prepareLayers);
-    var las_image = global_images[global_images.length -1].getBounds();
-    var init_bounds = default_bounds || las_image;
-    map.whenReady(function(){
-            window.setTimeout(function(){
-                map.fitBounds(init_bounds);
-            }, 1000);
-    });
-    map.setView([50.854075572144815, 4.38629150390625], 13);
+    if(global_images.length > 0){
+        var las_image = global_images[global_images.length -1].getBounds();
+        var init_bounds = default_bounds || las_image;
+        map.whenReady(function(){
+                window.setTimeout(function(){
+                    map.fitBounds(init_bounds);
+                }, 1000);
+        });
+    }
+    map.setView([50.854075572144815, 4.38629150390625], 15);
     
     if(window.history && window.history.pushState)
     {

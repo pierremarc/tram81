@@ -73,7 +73,7 @@ class JSConf(TemplateView):
         try:
             context['REQ_IMAGES'] = GeoImage.objects.filter(pk__in=ids)
         except Exception:
-            context['REQ_IMAGES'] = []
+            context['REQ_IMAGES'] = None
         context['csrf'] = get_token(self.request)
         context['HAS_COMMENTS'] = getattr(settings, 'HAS_COMMENTS', False)
         
