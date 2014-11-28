@@ -114,13 +114,15 @@ jQuery(document).ready(function($){
                 .add(new Geom.Point(0, y))
                 .add(new Geom.Point(0, 0));
 
-            var bbox = new Geom.Rect(0, 0, w, h);
-            var bboxCenter = bbox.center();
 
             var transform = new Geom.Transform();
             transform.translate(x,y);
-            transform.mapPoint(bboxCenter);
-            transform.rotate(rotationValue, bboxCenter);
+            if(rotationValue){
+                var bbox = new Geom.Rect(0, 0, w, h);
+                var bboxCenter = bbox.center();
+                transform.mapPoint(bboxCenter);
+                transform.rotate(rotationValue, bboxCenter);
+            }
             path.transform(transform);
 
             var pts_ll = _.map(path.points, function(point){
