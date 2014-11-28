@@ -176,7 +176,7 @@
       "id": "waterways-labels",
       "class": "",
       "Datasource": {
-        "file": "waterways.shp",
+        "file": "shp/waterways.shp",
         "id": "waterways-labels",
         "project": "mons",
         "srs": ""
