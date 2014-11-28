@@ -13,6 +13,7 @@ from exifread import process_file as read_exif
 from zipfile import ZipFile
 from StringIO import StringIO
 
+from django.conf import settings
 from django.core.files.images import ImageFile
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
@@ -31,7 +32,10 @@ K_LonRef = 'GPS GPSLongitudeRef'
 
 K_DateTime = 'EXIF DateTimeOriginal'
 
-PX_M = float(0.05)
+try:
+    PX_M = float(settings.BULK_SIZE_FACTOR)
+except Exception:
+    PX_M = float(0.05)
 
 MAP = Map()
 
