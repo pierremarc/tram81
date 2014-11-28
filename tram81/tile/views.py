@@ -192,7 +192,7 @@ class Map(object):
         self.map = mapnik.Map(settings.MAPNIK_TILE_SIZE, settings.MAPNIK_TILE_SIZE)
         mapnik.load_map(self.map, self.mapfile)
         
-        self.map.zoom_to_box(self.map.maximum_extent)
+        # self.map.zoom_to_box(self.map.maximum_extent)
 
         self.proj = mapnik.Projection(self.map.srs)
         self.transform = mapnik.ProjTransform(LONGLAT_PROJ, self.proj)
