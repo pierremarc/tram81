@@ -320,7 +320,6 @@ jQuery(document).ready(function($){
     
     var base_layer = L.tileLayer('{{TILE_SERVER}}', {
         attribution: 'Me',
-        maxZoom: 18
     });
     {% if object %}
     base_layer.once('load', setupuGeoImage);
