@@ -110,16 +110,15 @@ jQuery(document).ready(function($){
             console.log('updateGeometry', x, y, w, h);
 
             var path = new Geom.Path();
-            path.add(new Geom.Point(0,   0))
-                .add(new Geom.Point(w, 0))
-                .add(new Geom.Point(w, h))
-                .add(new Geom.Point(0,   h))
-                .add(new Geom.Point(0,   0));
+            path.add(new Geom.Point(x,   y))
+                .add(new Geom.Point(x+w, y))
+                .add(new Geom.Point(x+w, y+h))
+                .add(new Geom.Point(x,   y+h))
+                .add(new Geom.Point(x,   y));
 
             var transform = new Geom.Transform();
-            transform.translate(x,y);
-            // transform.rotate(rotationValue, (new Geom.Rect(x,y,w,h)).center());
-            transform.rotate(rotationValue, (new Geom.Rect(0,0,w,h)).center());
+            // transform.translate(x,y);
+            transform.rotate(rotationValue, (new Geom.Rect(x,y,w,h)).center());
 
             path.transform(transform);
 
