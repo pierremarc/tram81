@@ -38,17 +38,17 @@
 }
 
 </style>
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
-<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
-<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"></link>
+<link rel="stylesheet" href="{{STATIC_URL}}jquery-ui.css" />
+<link rel="stylesheet" href="{{STATIC_URL}}leaflet.css" />
+<link rel="stylesheet" href="{{STATIC_URL}}bootstrap.min.css"></link>
 <link rel="stylesheet" href="{{STATIC_URL}}datepicker/css/datepicker.css"></link>
 <!--[if lte IE 8]>
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
+    <link rel="stylesheet" href="{{STATIC_URL}}leaflet.ie.css" />
 <![endif]-->
-<script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
-<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+<script src="{{STATIC_URL}}leaflet-0.6.4/leaflet.js"></script>
+<script src="{{STATIC_URL}}jquery-1.9.1.js"></script>
+<script src="{{STATIC_URL}}jquery-ui.js"></script>
+<script src="{{STATIC_URL}}underscore-min.js"></script>
 <script src="{{STATIC_URL}}datepicker/js/bootstrap-datepicker.js"></script>
 <script src="{{STATIC_URL}}geom.js"></script>
 <script>
@@ -90,22 +90,26 @@ jQuery(document).ready(function($){
     var $wrapper = $('<div />');
 
     var rotationValue = 0;
+
+    var debug_layer;
     
     /// UPDATE GEOM ///////////////////
 
-    function rotate(){
+    function rotate(rot){
         $wrapper.css({
-            transform: 'rotate('+reverseRotate(rotationValue)+'deg)',
+            'transform': 'rotate('+rot+'deg)',
+            // 'transform-origin':'0% 100%',
         });
     };
 
     function updateGeometry(){
-            rotate();
+            // rotate(0);
             var E = $wrapper;
             var x = E.position().left;
             var y = E.position().top;
             var w = E.width();
             var h = E.height();
+            // rotate(reverseRotate(rotationValue));
 
             var path = new Geom.Path();
             path.add(new Geom.Point(0, 0))
@@ -114,20 +118,30 @@ jQuery(document).ready(function($){
                 .add(new Geom.Point(0, h))
                 .add(new Geom.Point(0, 0));
 
+            var bbox = new Geom.Rect(0, 0, w, h);
 
             var transform = new Geom.Transform();
             transform.translate(x,y);
+            transform.mapRect(bbox);
             if(rotationValue){
-                var bbox = new Geom.Rect(0, 0, w, h);
                 var bboxCenter = bbox.center();
-                transform.mapPoint(bboxCenter);
+                var mc = map.containerPointToLatLng(new L.Point(bboxCenter.x, bboxCenter.y));
+                L.marker(mc).addTo(map);
+                // transform.rotate(reverseRotate(rotationValue), bboxCenter);
                 transform.rotate(rotationValue, bboxCenter);
             }
             path.transform(transform);
+            if(debug_layer){
+                debug_layer.clearLayers();
+                map.removeLayer(debug_layer);
+            }
 
             var pts_ll = _.map(path.points, function(point){
                 return map.containerPointToLatLng(new L.Point(point.x, point.y));
             });
+
+            var debug_layer = L.geoJson(L.polygon(pts_ll).toGeoJSON());
+            map.addLayer(debug_layer);
             
             var pts_str = _.map(pts_ll, function(ll){
                 return ll.lng+' '+ll.lat;
@@ -342,7 +356,12 @@ jQuery(document).ready(function($){
         rotationValue = reverseRotate(ui.value);
         $rotation.val(rotationValue); 
         updateGeometry();   
-    });
+    });    
+    // $rotator.on('slidechange', function(event, ui){
+    //     rotationValue = reverseRotate(ui.value);
+    //     $rotation.val(rotationValue); 
+    //     updateGeometry();   
+    // });
 
 
 
