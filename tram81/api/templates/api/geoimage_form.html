@@ -38,18 +38,18 @@
 }
 
 </style>
-<link rel="stylesheet" href="{{STATIC_URL}}jquery-ui.css" />
-<link rel="stylesheet" href="{{STATIC_URL}}leaflet.css" />
 <link rel="stylesheet" href="{{STATIC_URL}}bootstrap.min.css"></link>
 <link rel="stylesheet" href="{{STATIC_URL}}datepicker/css/datepicker.css"></link>
+<link rel="stylesheet" href="{{STATIC_URL}}leaflet.css" />
+<link rel="stylesheet" href="{{STATIC_URL}}jquery-ui-1.11.2.custom/jquery-ui.css" />
 <!--[if lte IE 8]>
     <link rel="stylesheet" href="{{STATIC_URL}}leaflet.ie.css" />
 <![endif]-->
-<script src="{{STATIC_URL}}leaflet.js"></script>
-<script src="{{STATIC_URL}}jquery-1.9.1.js"></script>
-<script src="{{STATIC_URL}}jquery-ui.js"></script>
 <script src="{{STATIC_URL}}underscore-min.js"></script>
+<script src="{{STATIC_URL}}jquery-ui-1.11.2.custom/external/jquery/jquery.js"></script>
 <script src="{{STATIC_URL}}datepicker/js/bootstrap-datepicker.js"></script>
+<script src="{{STATIC_URL}}leaflet.js"></script>
+<script src="{{STATIC_URL}}jquery-ui-1.11.2.custom/jquery-ui.js"></script>
 <script src="{{STATIC_URL}}geom.js"></script>
 <script>
 
@@ -103,13 +103,13 @@ jQuery(document).ready(function($){
     };
 
     function updateGeometry(){
-            // rotate(0);
+            rotate(0);
             var E = $wrapper;
             var x = E.position().left;
             var y = E.position().top;
             var w = E.width();
             var h = E.height();
-            // rotate(reverseRotate(rotationValue));
+            rotate(reverseRotate(rotationValue));
 
             var path = new Geom.Path();
             path.add(new Geom.Point(0, 0))
@@ -118,30 +118,30 @@ jQuery(document).ready(function($){
                 .add(new Geom.Point(0, h))
                 .add(new Geom.Point(0, 0));
 
-            var bbox = new Geom.Rect(0, 0, w, h);
 
             var transform = new Geom.Transform();
             transform.translate(x,y);
-            transform.mapRect(bbox);
             if(rotationValue){
-                var bboxCenter = bbox.center();
-                var mc = map.containerPointToLatLng(new L.Point(bboxCenter.x, bboxCenter.y));
-                L.marker(mc).addTo(map);
+                var bbox = new Geom.Rect(0, 0, w, h);
+                transform.mapRect(bbox);
+                // var bboxCenter = bbox.center();
+                // var mc = map.containerPointToLatLng(new L.Point(bboxCenter.x, bboxCenter.y));
+                // L.marker(mc).addTo(map);
                 // transform.rotate(reverseRotate(rotationValue), bboxCenter);
-                transform.rotate(rotationValue, bboxCenter);
+                transform.rotate(reverseRotate(rotationValue), bbox.center());
             }
             path.transform(transform);
-            if(debug_layer){
-                debug_layer.clearLayers();
-                map.removeLayer(debug_layer);
-            }
+            // if(debug_layer){
+            //     debug_layer.clearLayers();
+            //     map.removeLayer(debug_layer);
+            // }
 
             var pts_ll = _.map(path.points, function(point){
                 return map.containerPointToLatLng(new L.Point(point.x, point.y));
             });
 
-            var debug_layer = L.geoJson(L.polygon(pts_ll).toGeoJSON());
-            map.addLayer(debug_layer);
+            // var debug_layer = L.geoJson(L.polygon(pts_ll).toGeoJSON());
+            // map.addLayer(debug_layer);
             
             var pts_str = _.map(pts_ll, function(ll){
                 return ll.lng+' '+ll.lat;
@@ -157,7 +157,7 @@ jQuery(document).ready(function($){
     function insertImage(ix, iy, width, height){
             var nw = $img[0].naturalWidth || width;
             var nh = $img[0].naturalHeight || height;
-            var ts = 200
+            var ts = 400
             var ratio = nw/nh;
             
             var w = (nw > nh) ? ts : (nw * ts / nh);
@@ -185,11 +185,11 @@ jQuery(document).ready(function($){
                 'background-color':'blue',
             });
             
-            
+            $map = $('#map');
             $wrapper.css({
 //                 position:'absolute',
-                top: iy || '32px',
-                left: ix || '32px',
+                top: (iy || ($map.height() - h) /2) + 'px',
+                left: (ix || ($map.width() - w) /2) + 'px',
                 width: (w) + 'px',
                 height: (h) + 'px',
 //                 border:'1px solid blue',
@@ -206,23 +206,18 @@ jQuery(document).ready(function($){
             });
             $wrapper.draggable();
             
-            updateGeometry();
             
-            
-            $wrapper.on('resize', function(evt, ui){
-                $('#info_size').text(Math.floor(ui.size.width) +'+'+ui.size.height);
-//                 updateGeometry();
-            });
-            $wrapper.on('drag', function(evt,ui){
-                var pos = new L.Point(ui.offset.left, ui.offset.top);
-                var ll = map.containerPointToLatLng(pos);
-                $('#info_pos').text(ll);
-            });
+            // $wrapper.on('resize', function(evt, ui){
+            //     $('#info_size').text(Math.floor(ui.size.width) +'+'+ui.size.height);
+            // });
+            // $wrapper.on('drag', function(evt,ui){
+            //     var pos = new L.Point(ui.offset.left, ui.offset.top);
+            //     var ll = map.containerPointToLatLng(pos);
+            //     $('#info_pos').text(ll);
+            // });
             $wrapper.on('resizestop',function(){ updateGeometry();});
             $wrapper.on('dragstop',function(){ updateGeometry();});
-            
-            
-        
+            updateGeometry();
         };
     /////////////////////////////////
     
@@ -230,8 +225,12 @@ jQuery(document).ready(function($){
     //// SETUP GEOIMAGE
     {% if object %}
     {% autoescape off %}
+
+
+
     function setupuGeoImage(evt){
-        map.once('viewreset', function(evt){
+
+        var imageOnReset = function(){
             var ix, iy, iw, ih;
             if(0 === {{object.rotation}}){
                 ix = map.latLngToContainerPoint(gb.getNorthWest()).x;
@@ -246,30 +245,21 @@ jQuery(document).ready(function($){
                 var bbRect = new Geom.Rect(nwPt.x, nwPt.y, sePt.x - nwPt.x, sePt.y - nwPt.y);
                 var center = bbRect.center();
                 var path = new Geom.Path;
+                
 
-                var coords = _.reduce(cur_geom.coordinates[0], function(memo, pt){
+                _.reduce(cur_geom.coordinates[0], function(memo, pt){
                     memo.add(map.latLngToContainerPoint([pt[1], pt[0]]));
                     return memo;
-                }, path)
+                }, path);
 
                 var T = new Geom.Transform;
-                T.rotate(-{{object.rotation}}, center);
+                T.rotate(- reverseRotate({{object.rotation}}), center);
                 path.transform(T);
 
-                var minx = 100000, miny = 100000, maxx = -100000, maxy = -100000;
-                _.each(path.points, function(pt){
-                    minx = Math.min(minx, pt.x);
-                    maxx = Math.max(maxx, pt.x);
-                    miny = Math.min(miny, pt.y);
-                    maxy = Math.max(maxy, pt.y);
-                });
-
-                ix = minx;
-                iy = miny;
-                iw = maxx - minx;
-                ih = maxy - miny;
-                // iw = 200;
-                // ih = 200;
+                ix = path.points[0].x;
+                iy = path.points[0].y;
+                iw = path.points[0].distance(path.points[1]);
+                ih = path.points[1].distance(path.points[2]);
             }
             $img = $('<img />');
             $img.css({
@@ -281,10 +271,12 @@ jQuery(document).ready(function($){
             $img.appendTo('#map');
             $img.attr('src', '{{object.image.url}}');
             insertImage(ix, iy, iw, ih);
-        });
+        };
+
+        map.once('viewreset', imageOnReset);
         var gg = new L.geoJson(cur_geom);
         var gb = gg.getBounds();
-        map.fitBounds(gb);
+        map.fitBounds(gb, {reset:true});
     };
     {% endautoescape %}
     {% endif %}
