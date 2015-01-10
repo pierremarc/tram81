@@ -9,7 +9,7 @@
           color: 'rgba(255, 255, 0, 0.5)'
         })
     });
-    return [s];
+    return [];
 };
 
 
@@ -57,7 +57,9 @@ function prepareMap(){
 };
 
 function setupInteraction(){
-    var select = new ol.interaction.Select();
+    var select = new ol.interaction.Select({
+        style:[],
+    });
     var features = select.getFeatures();
     features.on('add', function(event){
         pushState(event.element);
