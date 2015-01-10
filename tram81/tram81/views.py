@@ -17,6 +17,7 @@
 """
 
 import datetime
+import json
 
 from django.views.generic import TemplateView
 from django.conf import settings
@@ -66,7 +67,7 @@ class JSConf(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super(JSConf, self).get_context_data(**kwargs)
-        context['TILE_SERVER'] = settings.TILE_SERVER
+        context['TILE_SERVER'] = json.dumps(settings.TILE_SERVER)
         context['images'] = GeoImage.objects.all().order_by('pub_date')
         ids = self.request.GET['ids'].split(',')
         #print 'IDS: %s'%(ids,)
