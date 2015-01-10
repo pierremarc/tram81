@@ -2,53 +2,18 @@
 <html>
 <head>
     <title>{{SITE_TITLE}}</title>
-    <link rel="stylesheet" href="{{STATIC_URL}}leaflet.css" />
-    <!--[if lte IE 8]>
-        <link rel="stylesheet" href="{{STATIC_URL}}leaflet.ie.css" />
-    <![endif]-->
+    <link rel="stylesheet" href="{{STATIC_URL}}ol.css" />
     <link rel="stylesheet" href="{{STATIC_URL}}tram81.css" />
-    
-    
-    
-    <script src="{{STATIC_URL}}leaflet.js"></script>
+
+    <script src="{{STATIC_URL}}ol.js"></script>
     <script src="{{STATIC_URL}}jquery-min.js"></script>
     <script src="{{STATIC_URL}}underscore-min.js"></script>
     
-
     <script src="{% url 'js_conf' %}?ids={{REQ_IMAGES}}"></script>
+    <script src="{{STATIC_URL}}mons.js"></script>
 </head>
 
 <body>
-{% if HAS_COMMENTS %}
-<div id="fb-root"></div>
-<script>
-  window.fbAsyncInit = function() {
-    // init the FB JS SDK
-    FB.init({
-      appId      : '{{FB_APP_ID}}',                        // App ID from the app dashboard
-      channelUrl : '{{STATIC_URL}}channel.html', // Channel file for x-domain comms
-      status     : true,                                 // Check Facebook Login status
-      xfbml      : true                                  // Look for social plugins on the page
-    });
-
-    // Additional initialization code such as adding Event Listeners goes here
-    FB.Event.subscribe('auth.authResponseChange', function(response) {
-        console.log('The status of the session is: ' + response.status);
-    });
-  };
-
-  // Load the SDK asynchronously
-  (function(d, s, id){
-     var js, fjs = d.getElementsByTagName(s)[0];
-     if (d.getElementById(id)) {return;}
-     js = d.createElement(s); js.id = id;
-     js.src = "//connect.facebook.net/en_US/all.js";
-     fjs.parentNode.insertBefore(js, fjs);
-   }(document, 'script', 'facebook-jssdk'));
-
-</script>
-{% endif %}
-
 
 <div id="map"></div>
 <div id="info_box"></div>

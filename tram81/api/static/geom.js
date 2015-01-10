@@ -278,7 +278,7 @@
         *
         * @returns {Geom.Points}
         */
-        currentTranslate: function(){
+        getTranslate: function(){
             return new Geom.Point(this.m.m[3][1], this.m.m[3][2]);
         },
 

@@ -58,7 +58,7 @@ class IndexView(TemplateView):
         return context
     
 class JSConf(TemplateView):
-    template_name = "tram81.js"
+    template_name = "data.js"
     
     def render_to_response(self, context, **response_kwargs):
         response_kwargs['content_type'] = 'text/javascript'
