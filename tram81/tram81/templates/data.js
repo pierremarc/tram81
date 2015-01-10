@@ -34,7 +34,7 @@ function parseISO8601(dateStringInRange) {
 
 window.T81 = {};
 window.T81.config = {
-    TILE_SERVER: '{{TILE_SERVER}}',
+    TILE_SERVER: JSON.parse('{{TILE_SERVER}}'),
 };
 window.T81.data = [
 {% for image in images %}
