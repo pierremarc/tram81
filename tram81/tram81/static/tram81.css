@@ -23,7 +23,27 @@ background-color: rgba(255, 255, 255, 0.95);
 /* padding: 32px; */
 overflow: auto;
 }
+.pane-content{
+    width: 100%;
+    height: 100%;
+}
 
+#panel_close{
+    position: absolute;
+    top:32px;
+    right: 32px;
+    width: 120px;
+    height: 120px;
+    background-color: rgba(125,125,125,0.5);
+    color:black;
+    font-weight: bold;
+    font-family: sans-serif;
+    font-size: 16pt;
+    cursor: pointer;
+}
+#panel_close:hover{
+    background-color: white;
+}
 .txt_box{
     /*    position:absolute;
      *    top:32px;right:32px;bottom:32px;left:auto;*/
@@ -238,7 +258,7 @@ width: 100%;
 left:0;
 bottom:0;
 z-index:100;
-background: rgba(255, 255, 255, 0.1);
+background: transparent;
 text-align: center;
 padding: 5px 0px;
 }
@@ -255,3 +275,12 @@ padding: 5px 0px;
     text-decoration: none;
     color: #000;
 }
+
+.ol-attribution{
+    display: none;
+}
+
+.ol-rotate{
+    display: none;
+}
+
