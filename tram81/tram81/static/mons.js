@@ -20,8 +20,8 @@ function reverseRotate(r){
 
 function prepareMap(){
 
-    var tileSource = new ol.source.XYZ(window.T81.config.TILE_SERVER);
-    // var tileSource = new ol.source.OSM();
+    // var tileSource = new ol.source.XYZ(window.T81.config.TILE_SERVER);
+    var tileSource = new ol.source.OSM();
     var tileLayer = new ol.layer.Tile({source: tileSource});
 
     var view = new ol.View({zoom: 8 });
@@ -49,10 +49,10 @@ function prepareMap(){
           dataLayer
         ],
         view: view,
-        loadTilesWhileAnimating: true,
+        // loadTilesWhileAnimating: true,
       });
-    var feature = _.last(window.T81.dataSource.getFeatures());
 
+    var feature = _.last(window.T81.dataSource.getFeatures());
     view.fitExtent(feature.getGeometry().getExtent(), window.T81.map.getSize());
 };
 
@@ -121,8 +121,10 @@ function popState(evt){
         }
     }
     else{
-        window.T81.map.getView().fitExtent(
-            _.last(window.T81.dataSource.getFeatures()), window.T81.map.getSize());
+        var feature = _.last(window.T81.dataSource.getFeatures());
+        // var view = window.T81.map.getView();
+        // view.fitExtent(feature.getGeometry().getExtent(), window.T81.map.getSize());
+        showFeature(feature);
     }
 };
 
