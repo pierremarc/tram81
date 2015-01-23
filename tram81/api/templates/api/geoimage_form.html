@@ -405,9 +405,17 @@ jQuery(document).ready(function($){
 
     <div class="form-group">
         <h3>
-            Rotaion
+            Rotation
         </h3>
         <div class="rotator"></div>
+    </div>
+
+
+    <div class="form-group">
+        <h3>
+            Panel
+        </h3>
+         <input type='checkbox' name="panel"  {% if object.panel %}checked="true"{% endif %} />
     </div>
 
     <button type="submit" class="btn btn-primary" id="submit" >enregistrer</button>

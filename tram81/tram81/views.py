@@ -33,23 +33,23 @@ class IndexView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
-        
         try:
-            y = int(context['y'])
-            m = int(context['m'])
-            d = int(context['d'])
-            req_images = GeoImage.objects.filter(pub_date=datetime.date(y,m,d))
-        except Exception, ex:
+            ids = context['pk'].split(',')
+        except Exception:
             try:
-                req_images = GeoImage.objects.filter(pk=context['pk'])
-            except Exception:
+                y = int(context['y'])
+                m = int(context['m'])
+                d = int(context['d'])
+                req_images = GeoImage.objects.filter(pub_date=datetime.date(y,m,d))
+            except Exception, ex:
                 try:
                     req_images = [GeoImage.objects.all().order_by('-pub_date')[0]]
                 except Exception:
                     req_images = []
-        ids = []
-        for ri in req_images:
-            ids.append(str(ri.pk))
+            ids = []
+            for ri in req_images:
+                ids.append(str(ri.pk))
+        
         context['HAS_COMMENTS'] = getattr(settings, 'HAS_COMMENTS', False)
         context['REQ_IMAGES'] = ','.join(ids)
         context['FB_APP_ID'] = getattr(settings, 'SOCIAL_AUTH_FACEBOOK_KEY', '~')

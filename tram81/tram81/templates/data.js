@@ -50,40 +50,22 @@ window.T81.data = [
             rotation: {{ image.rotation }},
             txt: '{{ image.text|md|escapejs }}',
             pub: formatDate(parseISO8601('{{ image.pub_date|date:"c" }}')),
+            panel: (('{{ image.panel }}' === 'False') ? false : true),
         },
     geometry: JSON.parse('{{ image.geom.geojson }}')
 },
 {% endfor %}
 ];
 
-window.T81.default_bounds = undefined;
-
+window.T81.journey = [];
 {% if REQ_IMAGES %}
-(function(){
-    // var rims = [];
-    // {% for rim in REQ_IMAGES %}
-    // var source = new ol.source.GeoJSON({
-    //     object: JSON.parse('{{ rim.geom.geojson }}')
-    // });
-    // //rims.push(  new L.geoJson(JSON.parse('{{ rim.geom.geojson }}')) );
-    // rims.push(source);
-    // {% endfor %}
-    // window.T81.default_bounds = rims[0].getBounds();
-    // _.each(rims,function(r){
-    //     window.T81.default_bounds.extend(r.getBounds());
-    // });
-})();
-
+    {% for ri in REQ_IMAGES %}
+window.T81.journey.push({{ ri.pk }});
+    {% endfor %}
 {% endif %}
+
+window.T81.default_bounds = undefined;
 
 {% endautoescape %}
 
 
-{% if HAS_COMMENTS %}
-window.T81.config.HAS_COMMENTS = true;
-window.T81.config.NEW_COMMENT_URL = '{% url 'comment_new' %}';
-{% endif %}
-
-{% if user %}
-window.T81.config.USERNAME = '{{ user.username }}';
-{% endif %}
