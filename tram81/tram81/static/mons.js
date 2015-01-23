@@ -9,7 +9,7 @@
           color: 'rgba(255, 255, 0, 0.5)'
         })
     });
-    return [];
+    return [s];
 };
 
 
@@ -39,7 +39,8 @@ function prepareMap(){
 
     var dataLayer = new ol.layer.Vector({
         source: window.T81.dataSource,
-        style: styleFunction
+        style: styleFunction,
+        opacity: 0,
     });
 
     window.T81.map = new ol.Map({
