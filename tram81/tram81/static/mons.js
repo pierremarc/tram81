@@ -22,7 +22,7 @@ var baseStyle = new ol.style.Style({
 });
 
 function styleFunction(feature, resolution) {
-    return [baseStyle];
+    // return [baseStyle];
 };
 
 
@@ -53,7 +53,7 @@ function prepareMap(){
     var dataLayer = new ol.layer.Vector({
         source: T81.dataSource,
         style: styleFunction,
-        // opacity: 0,
+        opacity: 0,
     });
 
     T81.map = new ol.Map({
