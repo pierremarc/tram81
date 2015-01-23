@@ -20,8 +20,8 @@ function reverseRotate(r){
 
 function prepareMap(){
 
-    // var tileSource = new ol.source.XYZ(window.T81.config.TILE_SERVER);
-    var tileSource = new ol.source.OSM();
+    var tileSource = new ol.source.XYZ(window.T81.config.TILE_SERVER);
+    // var tileSource = new ol.source.OSM();
     var tileLayer = new ol.layer.Tile({source: tileSource});
 
     var view = new ol.View({zoom: 8 });
