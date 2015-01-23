@@ -22,7 +22,7 @@ var baseStyle = new ol.style.Style({
 });
 
 function styleFunction(feature, resolution) {
-    // return [baseStyle];
+    return [baseStyle];
 };
 
 
@@ -53,7 +53,7 @@ function prepareMap(){
     var dataLayer = new ol.layer.Vector({
         source: T81.dataSource,
         style: styleFunction,
-        opacity: 0,
+        opacity: 1,
     });
 
     T81.map = new ol.Map({
@@ -95,9 +95,7 @@ function showFeature(feature){
     var rot = props.rotation * Math.PI / 180;
     var extent = feature.getGeometry().getExtent();
     var center = ol.extent.getCenter(extent);
-    // var distance = (new ol.geom.LineString([center, map.getView().getCenter()])).getLength(); 
     var duration = 1200;
-    console.log(duration);
     var rotate = ol.animation.rotate({
         duration: duration,
         rotation: map.getView().getRotation(),

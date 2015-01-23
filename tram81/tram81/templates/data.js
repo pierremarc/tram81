@@ -48,7 +48,7 @@ window.T81.data = [
             img_large_url: '{{ image.img_large }}',
             img_thumnail_url: '{{ image.img_thumbnail }}',
             rotation: {{ image.rotation }},
-            txt: '{{ image.text|md|escapejs }}',
+            txt: {% if image.panel %} '{{ image.text|md|escapejs }}' {% else %}''{% endif %},
             pub: formatDate(parseISO8601('{{ image.pub_date|date:"c" }}')),
             panel: (('{{ image.panel }}' === 'False') ? false : true),
         },
