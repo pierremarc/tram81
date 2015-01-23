@@ -50,7 +50,7 @@ function prepareMap(){
           dataLayer
         ],
         view: view,
-        // loadTilesWhileAnimating: true,
+        loadTilesWhileAnimating: true,
       });
 
     var feature = _.last(window.T81.dataSource.getFeatures());
