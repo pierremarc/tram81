@@ -8,6 +8,7 @@ from datetime import date
 
 class GeoImage(models.Model):
     
+    objects = models.GeoManager()
     height = models.IntegerField(default=0, editable=False)
     width = models.IntegerField(default=0, editable=False)
     image = models.ImageField(upload_to='images', 
@@ -16,9 +17,7 @@ class GeoImage(models.Model):
                               max_length=124)
     geom = models.PolygonField(srid=4326)
     rotation = models.IntegerField(default=0)
-    objects = models.GeoManager()
-    
-    
+    panel = models.BooleanField(default=False)
     text = models.TextField(default=u'', blank=True)
     pub_date = models.DateField(default=date.today)
 
