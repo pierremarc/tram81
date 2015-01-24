@@ -35,23 +35,11 @@ class IndexView(TemplateView):
         context = super(IndexView, self).get_context_data(**kwargs)
         try:
             ids = context['pk'].split(',')
+            context['REQ_IMAGES'] = ','.join(ids)
         except Exception:
-            try:
-                y = int(context['y'])
-                m = int(context['m'])
-                d = int(context['d'])
-                req_images = GeoImage.objects.filter(pub_date=datetime.date(y,m,d))
-            except Exception, ex:
-                try:
-                    req_images = [GeoImage.objects.all().order_by('-pub_date')[0]]
-                except Exception:
-                    req_images = []
-            ids = []
-            for ri in req_images:
-                ids.append(str(ri.pk))
+            pass
         
         context['HAS_COMMENTS'] = getattr(settings, 'HAS_COMMENTS', False)
-        context['REQ_IMAGES'] = ','.join(ids)
         context['FB_APP_ID'] = getattr(settings, 'SOCIAL_AUTH_FACEBOOK_KEY', '~')
         context['FOOTER'] = getattr(settings, 'FOOTER', None)
         context['SITE_TITLE'] = getattr(settings, 'SITE_TITLE', '~')
@@ -67,7 +55,7 @@ class JSConf(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super(JSConf, self).get_context_data(**kwargs)
-        context['TILE_SERVER'] = json.dumps(settings.TILE_SERVER)
+        context['TILE_SERVER'] = settings.TILE_SERVER
         context['images'] = GeoImage.objects.all().order_by('pub_date')
         ids = self.request.GET['ids'].split(',')
         #print 'IDS: %s'%(ids,)
@@ -76,7 +64,7 @@ class JSConf(TemplateView):
         except Exception:
             context['REQ_IMAGES'] = None
         context['csrf'] = get_token(self.request)
-        context['HAS_COMMENTS'] = getattr(settings, 'HAS_COMMENTS', False)
+        context['MAP_OPTIONS'] = json.dumps(getattr(settings, 'MAP_OPTIONS', {}))
         
         return context
         

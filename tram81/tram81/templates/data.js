@@ -34,7 +34,8 @@ function parseISO8601(dateStringInRange) {
 
 window.T81 = {};
 window.T81.config = {
-    TILE_SERVER: JSON.parse('{{TILE_SERVER}}'),
+    TILE_SERVER: '{{TILE_SERVER}}',
+    MAP_OPTIONS: JSON.parse('{{ MAP_OPTIONS }}')
 };
 window.T81.data = [
 {% for image in images %}
@@ -64,7 +65,6 @@ window.T81.journey.push({{ ri.pk }});
     {% endfor %}
 {% endif %}
 
-window.T81.default_bounds = undefined;
 
 {% endautoescape %}
 
