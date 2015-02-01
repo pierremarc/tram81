@@ -18,11 +18,11 @@
 @water : #e4e9f4;
 
 //LABELS VARIABLES
-@road-label : 'Crimson Text Semibold';
+@road-label : 'Dauphine Regular';
 @road-label-color : (@grey - 70%);
 @place-label : 'Crimson Text Bold';
 @place-label-color : (@grey - 100%);
-@water-label : 'Crimson Text Roman';
+@water-label : 'Dauphine Italic';
 
 
 Map {
