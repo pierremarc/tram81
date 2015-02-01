@@ -184,6 +184,7 @@
   text-spacing: 100;
   text-min-distance: 200;
   text-allow-overlap: false;
+  text-transform: uppercase;
   
   [zoom>17] {text-halo-radius:3;}
   [zoom<=19]{text-max-char-angle-delta: 22.5;}

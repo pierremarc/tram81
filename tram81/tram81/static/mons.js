@@ -61,7 +61,7 @@ function prepareMap(){
           dataLayer
         ],
         view: view,
-        loadTilesWhileAnimating: true,
+        loadTilesWhileAnimating: false,
       });
 
     var feature = _.last(T81.dataSource.getFeatures());
@@ -170,8 +170,8 @@ function popState(evt){
         }
     }
     else{
-        var feature = _.last(T81.dataSource.getFeatures());
-        showFeature(feature);
+        // var feature = _.last(T81.dataSource.getFeatures());
+        // showFeature(feature);
     }
 };
 

@@ -1,5 +1,5 @@
 #roads{  
-  [zoom=14]  {line-dasharray: 0,0;}
+  [zoom<=14]  {line-dasharray: 0,0;}
   [zoom=15]  {line-dasharray: 1,2; line-color: @roads;}
   [zoom=16]  {line-dasharray: 1,2; line-color: (@roads - 10%);}
   [zoom=17]  {line-dasharray: 1,3; line-color: (@roads - 20%);}
